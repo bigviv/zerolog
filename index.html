@@ -1,0 +1,384 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZeroLog v4.1 | Production</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* BASE THEME: High-contrast Dark Mode for Gym Environments */
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background-color: #000; 
+            color: #fff; 
+            touch-action: manipulation; /* Prevents accidental zooming on double-tap */
+            overflow-x: hidden; 
+        }
+
+        /* UI COMPONENTS */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .flash-alert { 
+            animation: flashRed 0.4s ease-in-out 6; 
+        }
+        
+        @keyframes flashRed { 
+            0%, 100% { background-color: #000; } 
+            50% { background-color: #ef4444; } 
+        }
+
+        .tab-active { 
+            color: #3b82f6; 
+            border-bottom: 2px solid #3b82f6; 
+        }
+
+        /* MODAL: Fixed bleed-through with solid black and high z-index */
+        .library-modal { 
+            background-color: #000 !important; 
+            z-index: 9999 !important; 
+        }
+
+        /* INPUTS: Number-only keyboard styling */
+        input::placeholder { color: rgba(59, 130, 246, 0.4); font-style: italic; }
+        input[type="number"] { -moz-appearance: textfield; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const STORAGE_KEY = "zerolog_v4_1_prod";
+
+        // --- CONSTANTS & INITIAL STATE ---
+        const DEFAULT_LIB = {
+            "Chest": ["Bench Press", "Incline DB Press", "Cable Flyes"],
+            "Back": ["Deadlift", "Pullups", "Lat Pulldown"],
+            "Legs": ["Squat", "Leg Press", "Leg Extension"],
+            "Shoulders": ["Overhead Press", "Lateral Raise"],
+            "Arms": ["Bicep Curl", "Tricep Pushdown"]
+        };
+
+        const INITIAL_DAYS = [
+            { id: 'd1', label: 'Mon', title: 'Chest & Tri', exercises: [], isRest: false },
+            { id: 'd2', label: 'Tue', title: 'Back & Bi', exercises: [], isRest: false },
+            { id: 'd3', label: 'Wed', title: 'Rest', exercises: [], isRest: true },
+            { id: 'd4', label: 'Thu', title: 'Shoulders', exercises: [], isRest: false },
+            { id: 'd5', label: 'Fri', title: 'Legs', exercises: [], isRest: false },
+            { id: 'd6', label: 'Sat', title: 'Rest', exercises: [], isRest: true },
+            { id: 'd7', label: 'Sun', title: 'Rest', exercises: [], isRest: true }
+        ];
+
+        function App() {
+            // --- STATE MANAGEMENT ---
+            const [state, setState] = useState(() => {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) : {
+                    settings: { defaultRestSeconds: 90, barWeight: 20, unit: 'kg' },
+                    history: [],
+                    days: INITIAL_DAYS,
+                    lib: DEFAULT_LIB
+                };
+            });
+
+            const [view, setView] = useState('workout');
+            const [activeIdx, setActiveIdx] = useState(0);
+            const [timer, setTimer] = useState(0);
+            const [isAlerting, setIsAlerting] = useState(false);
+            const [showLib, setShowLib] = useState(false);
+            const [search, setSearch] = useState("");
+            const [customEx, setCustomEx] = useState({ name: "", cat: "Chest" });
+            const wakeLock = useRef(null);
+
+            // --- PERSISTENCE ---
+            useEffect(() => { 
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); 
+            }, [state]);
+
+            // --- WAKE LOCK (App Polish: Keeps screen on) ---
+            useEffect(() => {
+                const requestWakeLock = async () => {
+                    try {
+                        if ('wakeLock' in navigator) {
+                            wakeLock.current = await navigator.wakeLock.request('screen');
+                        }
+                    } catch (err) { console.log("WakeLock failed"); }
+                };
+                requestWakeLock();
+                return () => wakeLock.current?.release();
+            }, []);
+
+            // --- TIMER & HAPTIC LOGIC ---
+            useEffect(() => {
+                let interval = null;
+                if (timer > 0) {
+                    interval = setInterval(() => setTimer(t => t - 1), 1000);
+                } else if (timer === 0 && interval !== null) {
+                    setIsAlerting(true);
+                    if ("vibrate" in navigator) navigator.vibrate([400, 200, 400]); // Haptic Buzz
+                    setTimeout(() => setIsAlerting(false), 3000);
+                    clearInterval(interval);
+                }
+                return () => clearInterval(interval);
+            }, [timer]);
+
+            // --- UTILITIES: Conversion & Plate Math ---
+            const convert = (val) => {
+                if (!val) return "";
+                const isKg = state.settings.unit === 'kg';
+                return isKg ? (val * 2.20462).toFixed(1) + " lb" : (val / 2.20462).toFixed(1) + " kg";
+            };
+
+            const getPlates = (target) => {
+                let weight = (parseFloat(target) - state.settings.barWeight) / 2;
+                if (isNaN(weight) || weight <= 0) return [];
+                const plates = state.settings.unit === 'kg' ? [25, 20, 15, 10, 5, 2.5, 1.25] : [45, 35, 25, 10, 5, 2.5];
+                let res = [];
+                plates.forEach(p => { while(weight >= p) { res.push(p); weight -= p; } });
+                return res;
+            };
+
+            // --- HISTORY GHOST LOGIC ---
+            const getGhost = (exName, setIdx) => {
+                const logs = state.history.filter(h => h.exData && h.exData[exName]);
+                if (logs.length === 0) return { w: '', r: '' };
+                const lastEntry = logs[logs.length - 1].exData[exName];
+                const lastSet = lastEntry[setIdx] || lastEntry[lastEntry.length - 1];
+                return { w: lastSet.w, r: lastSet.r };
+            };
+
+            // --- SESSION LOGGING ---
+            const logSession = () => {
+                if (!confirm("Confirm workout completion?")) return;
+                const day = state.days[activeIdx];
+                let vol = 0; let exData = {};
+                
+                day.exercises.forEach(ex => {
+                    const doneSets = ex.sets.filter(s => s.done);
+                    if (doneSets.length > 0) {
+                        exData[ex.name] = doneSets.map(s => ({ w: s.weight, r: s.reps }));
+                        doneSets.forEach(s => vol += (parseFloat(s.weight || 0) * parseFloat(s.reps || 0)));
+                    }
+                });
+
+                if (vol > 0) {
+                    const maxVol = state.history.length > 0 ? Math.max(...state.history.map(h => h.volume)) : 0;
+                    if (vol > maxVol) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    
+                    const ns = {...state};
+                    ns.history.push({ 
+                        date: new Date().toLocaleDateString('en-GB'), 
+                        title: day.title, 
+                        volume: vol.toFixed(1), 
+                        exData 
+                    });
+                    // Reset checkmarks for next week
+                    ns.days[activeIdx].exercises.forEach(e => e.sets.forEach(s => s.done = false));
+                    setState(ns);
+                }
+                setView('history');
+            };
+
+            // --- CORE UI UPDATES ---
+            const updateSet = (exIdx, sIdx, field, val) => {
+                const ns = {...state};
+                ns.days[activeIdx].exercises[exIdx].sets[sIdx][field] = val;
+                if (field === 'done' && val === true) {
+                    setTimer(state.settings.defaultRestSeconds);
+                    if ("vibrate" in navigator) navigator.vibrate(50); // Small haptic click
+                }
+                setState(ns);
+            };
+
+            const currentDay = state.days[activeIdx];
+
+            return (
+                <div className={`min-h-screen flex flex-col ${isAlerting ? 'flash-alert' : ''}`}>
+                    
+                    {/* TOP NAVIGATION BAR */}
+                    <nav className="flex border-b border-white/10 sticky top-0 bg-black z-40">
+                        {['workout', 'history', 'settings'].map(v => (
+                            <button key={v} onClick={() => setView(v)} className={`flex-1 p-4 font-bold text-[10px] tracking-widest uppercase ${view === v ? 'tab-active' : 'text-gray-600'}`}>{v}</button>
+                        ))}
+                    </nav>
+
+                    <main className="flex-1 max-w-md mx-auto w-full p-4 pb-32">
+                        
+                        {/* WORKOUT VIEW */}
+                        {view === 'workout' && (
+                            <div>
+                                {/* DAY SELECTOR */}
+                                <div className="flex gap-2 overflow-x-auto no-scrollbar mb-6">
+                                    {state.days.map((d, i) => (
+                                        <button key={i} onClick={() => setActiveIdx(i)} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase min-w-[80px] ${activeIdx === i ? 'bg-blue-600' : 'bg-white/5 opacity-20'}`}>{d.label}</button>
+                                    ))}
+                                </div>
+
+                                {/* HEADER AREA */}
+                                <div className="flex justify-between items-center mb-6">
+                                    <input className="text-2xl font-black uppercase italic bg-transparent outline-none flex-1" value={currentDay.title} onChange={e => {
+                                        const ns={...state}; ns.days[activeIdx].title = e.target.value; setState(ns);
+                                    }} />
+                                    <button onClick={() => setShowLib(true)} className="bg-blue-600 w-12 h-12 rounded-full font-bold text-2xl shadow-lg">+</button>
+                                </div>
+
+                                {/* EXERCISE LIST */}
+                                {currentDay.exercises.map((ex, exIdx) => (
+                                    <div key={exIdx} className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+                                        <div className="flex justify-between mb-4">
+                                            <span className="font-bold text-blue-500 uppercase text-xs tracking-widest">{ex.name}</span>
+                                            <button onClick={() => {if(confirm("Remove exercise?")){const ns={...state}; ns.days[activeIdx].exercises.splice(exIdx,1); setState(ns);}}} className="text-white/10 px-2">&times;</button>
+                                        </div>
+                                        
+                                        {/* SET ROWS */}
+                                        {ex.sets.map((s, sIdx) => {
+                                            const ghost = getGhost(ex.name, sIdx);
+                                            return (
+                                                <div key={sIdx} className={`mb-4 ${s.done ? 'opacity-20' : ''}`}>
+                                                    <div className="flex gap-2 items-center">
+                                                        <input type="number" inputMode="decimal" placeholder={ghost.w || state.settings.unit} className="w-1/4 p-4 bg-black border border-white/10 rounded-xl text-center font-bold" value={s.weight} onChange={e => updateSet(exIdx, sIdx, 'weight', e.target.value)} />
+                                                        <input type="number" inputMode="numeric" placeholder={ghost.r || "reps"} className="w-1/4 p-4 bg-black border border-white/10 rounded-xl text-center font-bold" value={s.reps} onChange={e => updateSet(exIdx, sIdx, 'reps', e.target.value)} />
+                                                        <button onClick={() => updateSet(exIdx, sIdx, 'done', !s.done)} className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold ml-auto ${s.done ? 'bg-blue-600 text-white' : 'border border-white/20'}`}>
+                                                            {s.done ? '✓' : ''}
+                                                        </button>
+                                                        <button onClick={() => {const ns={...state}; ns.days[activeIdx].exercises[exIdx].sets.splice(sIdx,1); setState(ns);}} className="w-8 h-12 text-white/5 text-xl">&times;</button>
+                                                    </div>
+                                                    
+                                                    {/* PLATE MATH HELPER */}
+                                                    <div className="flex flex-wrap gap-1 mt-2">
+                                                        {getPlates(s.weight).map((p,pi) => <span key={pi} className="text-[7px] font-bold bg-blue-900/40 text-blue-400 px-1 rounded">{p}</span>)}
+                                                        {sIdx > 0 && !s.done && <button onClick={() => {
+                                                            const ns={...state}; const prev=ns.days[activeIdx].exercises[exIdx].sets[sIdx-1];
+                                                            ns.days[activeIdx].exercises[exIdx].sets[sIdx].weight=prev.weight;
+                                                            ns.days[activeIdx].exercises[exIdx].sets[sIdx].reps=prev.reps; setState(ns);
+                                                        }} className="ml-auto text-[8px] text-blue-500 font-bold uppercase">Clone Prev</button>}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        <button onClick={() => {const ns={...state}; ns.days[activeIdx].exercises[exIdx].sets.push({weight:'', reps:'', done:false}); setState(ns);}} className="w-full py-2 text-[9px] font-bold uppercase text-white/10 tracking-widest">+ Add Set</button>
+                                    </div>
+                                ))}
+
+                                {currentDay.exercises.length > 0 && (
+                                    <button onClick={logSession} className="w-full py-5 bg-blue-600 rounded-2xl mt-8 font-black uppercase tracking-widest shadow-xl">Complete Day</button>
+                                )}
+                            </div>
+                        )}
+
+                        {/* HISTORY LOG VIEW */}
+                        {view === 'history' && (
+                            <div className="space-y-3">
+                                {[...state.history].reverse().map((h, i) => (
+                                    <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5 flex justify-between">
+                                        <div><p className="font-bold uppercase text-xs">{h.title}</p><p className="text-[10px] opacity-40 uppercase">{h.date}</p></div>
+                                        <p className="text-blue-500 font-bold">{h.volume}{state.settings.unit}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* SETTINGS VIEW */}
+                        {view === 'settings' && (
+                            <div className="space-y-6">
+                                <div className="bg-white/5 p-5 rounded-xl border border-white/10 flex justify-between items-center">
+                                    <span className="text-[10px] font-bold uppercase opacity-40">Preferred Unit</span>
+                                    <div className="flex gap-2">
+                                        {['kg', 'lb'].map(u => (
+                                            <button key={u} onClick={() => setState({...state, settings:{...state.settings, unit: u}})} className={`px-4 py-2 rounded-lg font-bold uppercase text-[10px] ${state.settings.unit === u ? 'bg-blue-600' : 'bg-white/10 opacity-30'}`}>{u}</button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-white/5 p-5 rounded-xl border border-white/10">
+                                    <label className="text-[10px] font-bold uppercase opacity-40 block mb-2">Rest Timer (Seconds)</label>
+                                    <input type="number" inputMode="numeric" className="w-full bg-black p-4 rounded-xl border border-white/10 font-bold text-blue-500" value={state.settings.defaultRestSeconds} onChange={e => setState({...state, settings:{...state.settings, defaultRestSeconds: parseInt(e.target.value) || 0}})} />
+                                </div>
+                                <div className="bg-white/5 p-5 rounded-xl border border-white/10">
+                                    <label className="text-[10px] font-bold uppercase opacity-40 block mb-2">Bar Weight ({state.settings.unit})</label>
+                                    <input type="number" inputMode="decimal" className="w-full bg-black p-4 rounded-xl border border-white/10 font-bold text-blue-500" value={state.settings.barWeight} onChange={e => setState({...state, settings:{...state.settings, barWeight: parseFloat(e.target.value) || 0}})} />
+                                </div>
+                                <button onClick={() => {
+                                    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+                                    const link = document.createElement('a');
+                                    link.setAttribute("href", data); link.setAttribute("download", "zerolog_export.json"); link.click();
+                                }} className="w-full py-4 bg-white/5 rounded-xl text-[10px] font-bold uppercase opacity-60">Export Data Backup</button>
+                                <button onClick={() => {if(confirm("Factory reset all data?")){ localStorage.clear(); location.reload(); }}} className="w-full py-4 text-red-900 font-bold text-[10px] uppercase opacity-40">Wipe All Data</button>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* EXERCISE LIBRARY OVERLAY */}
+                    {showLib && (
+                        <div className="library-modal fixed inset-0 p-6 overflow-y-auto">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-black italic uppercase">Add Exercise</h2>
+                                <button onClick={() => setShowLib(false)} className="text-3xl">&times;</button>
+                            </div>
+
+                            {/* CUSTOM ADD TOOL */}
+                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 mb-8">
+                                <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar">
+                                    {Object.keys(state.lib).map(cat => (
+                                        <button key={cat} onClick={() => setCustomEx({...customEx, cat})} className={`px-3 py-1 rounded-lg text-[8px] font-bold uppercase whitespace-nowrap ${customEx.cat === cat ? 'bg-blue-600' : 'bg-white/10 opacity-40'}`}>{cat}</button>
+                                    ))}
+                                </div>
+                                <div className="flex gap-2">
+                                    <input placeholder="Add custom move..." className="bg-transparent border-b border-white/10 outline-none flex-1 text-sm font-bold" value={customEx.name} onChange={e => setCustomEx({...customEx, name: e.target.value})} />
+                                    <button onClick={() => {
+                                        if(!customEx.name.trim()) return;
+                                        const ns={...state}; ns.lib[customEx.cat].push(customEx.name.trim());
+                                        setState(ns); setCustomEx({...customEx, name:""});
+                                    }} className="bg-blue-600 px-4 py-2 rounded-xl font-bold text-[10px] uppercase">Add</button>
+                                </div>
+                            </div>
+
+                            {/* SEARCH & LIBRARY LIST */}
+                            <input placeholder="Search library..." className="w-full p-4 bg-white/10 rounded-2xl mb-8 outline-none font-bold" value={search} onChange={e => setSearch(e.target.value)} />
+                            
+                            {Object.entries(state.lib).map(([cat, exs]) => (
+                                <div key={cat} className="mb-6">
+                                    <p className="text-blue-500 text-[9px] font-black uppercase mb-3 tracking-widest">{cat}</p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {exs.filter(e => e.toLowerCase().includes(search.toLowerCase())).map(e => (
+                                            <div key={e} className="flex gap-2">
+                                                <button onClick={() => {
+                                                    const ns = {...state};
+                                                    ns.days[activeIdx].exercises.push({name: e, sets: [{weight:'', reps:'', done:false}]});
+                                                    setState(ns); setShowLib(false);
+                                                }} className="flex-1 text-left p-4 bg-white/5 rounded-xl border border-white/5 font-bold uppercase text-[10px]">{e}</button>
+                                                <button onClick={() => {const ns={...state}; ns.lib[cat]=ns.lib[cat].filter(x=>x!==e); setState(ns);}} className="px-4 text-white/10">&times;</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* GLOBAL TIMER UI */}
+                    {timer > 0 && view === 'workout' && (
+                        <div className="fixed bottom-0 left-0 right-0 bg-blue-600 p-6 flex items-center justify-between z-50">
+                            <span className="text-4xl font-mono font-black">{Math.floor(timer/60)}:{(timer%60).toString().padStart(2, '0')}</span>
+                            <button onClick={() => setTimer(0)} className="bg-white/20 px-6 py-3 rounded-xl font-bold text-xs uppercase">Skip</button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- RENDER ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

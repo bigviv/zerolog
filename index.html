@@ -27,24 +27,12 @@
             color: var(--text);
             margin: 0;
             padding: 20px;
-            padding-bottom: 100px; /* Space for Ad */
+            padding-bottom: 120px; /* Space for Persistent Ad */
         }
 
-        /* Header & Tabs */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-style: italic;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin: 0;
-            text-transform: uppercase;
-        }
+        /* Branding & Navigation */
+        .header { margin-bottom: 20px; }
+        h1 { font-style: italic; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; }
 
         .tabs {
             display: flex;
@@ -69,33 +57,10 @@
             border-bottom: 2px solid var(--accent);
         }
 
-        /* Day Selection & Focus */
-        .day-picker {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-        }
-
-        .day {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: var(--card);
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--dim);
-            white-space: nowrap;
-        }
-
-        .day.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .day-title-container {
-            margin-bottom: 20px;
-        }
+        /* Inputs & Controls */
+        .day-picker { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+        .day { padding: 8px 16px; border-radius: 20px; background: var(--card); font-size: 12px; cursor: pointer; color: var(--dim); white-space: nowrap; }
+        .day.active { background: var(--accent); color: white; }
 
         .day-title-container input {
             width: 100%;
@@ -107,9 +72,9 @@
             font-weight: bold;
             padding: 10px 0;
             outline: none;
+            margin-bottom: 15px;
         }
 
-        /* Exercise Entry */
         .add-ex-container {
             background: #111;
             padding: 12px;
@@ -120,86 +85,20 @@
             border: 1px solid #222;
         }
 
-        .add-ex-container input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 14px;
-        }
+        .add-ex-container input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 14px; }
 
-        .quick-select {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
+        .quick-select { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
+        .q-btn { background: #222; color: #fff; border: 1px solid #333; padding: 6px 14px; border-radius: 6px; font-size: 11px; white-space: nowrap; cursor: pointer; }
 
-        .q-btn {
-            background: #222;
-            color: #fff;
-            border: 1px solid #333;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 11px;
-            white-space: nowrap;
-            cursor: pointer;
-        }
+        /* Cards & Exercise UI */
+        .exercise-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
+        .ex-header { display: flex; justify-content: space-between; color: var(--accent); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
+        
+        .set-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: #111; border-radius: 6px; font-size: 14px; }
+        .delete-btn { color: #ff4444; cursor: pointer; font-weight: bold; }
 
-        /* Cards */
-        .exercise-card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #1a1a1a;
-        }
-
-        .ex-header {
-            display: flex;
-            justify-content: space-between;
-            color: var(--accent);
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-
-        .set-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            padding: 10px;
-            background: #111;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .delete-btn {
-            color: #ff4444;
-            cursor: pointer;
-            padding: 0 5px;
-            font-weight: bold;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .input-row input {
-            background: #111;
-            border: 1px solid #222;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
-            text-align: center;
-        }
+        .input-row { display: flex; gap: 10px; margin-top: 15px; }
+        .input-row input { background: #111; border: 1px solid #222; color: white; padding: 12px; border-radius: 8px; width: 100%; text-align: center; }
 
         .feel-select {
             width: 100%;
@@ -212,27 +111,10 @@
             font-size: 12px;
         }
 
-        /* Rest Day Styling */
-        .recovery-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .recovery-tip {
-            background: #111;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #222;
-            font-size: 12px;
-        }
-
-        .recovery-tip strong {
-            display: block;
-            color: var(--accent);
-            margin-bottom: 5px;
-        }
+        /* Recovery Mode */
+        .recovery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .recovery-tip { background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; font-size: 12px; text-align: left; }
+        .recovery-tip strong { display: block; color: var(--accent); margin-bottom: 5px; }
 
         /* Timer Banner */
         #timer-banner {
@@ -251,37 +133,14 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        .timer-btns {
-            display: flex;
-            gap: 8px;
-        }
+        .timer-btns { display: flex; gap: 8px; }
+        .timer-btns button { background: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 12px; }
 
-        .timer-btns button {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 12px;
-            font-size: 12px;
-        }
+        /* Buttons */
+        button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-full { width: 100%; padding: 18px; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; }
 
-        /* Utility Buttons */
-        button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-full {
-            width: 100%;
-            padding: 18px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 20px;
-        }
-
-        /* Ads */
+        /* Persistent Ads */
         .ad-container {
             position: fixed;
             bottom: 0;
@@ -292,14 +151,13 @@
             text-align: center;
             z-index: 1000;
             border-top: 1px solid #222;
+            padding-top: 5px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>ZeroLog</h1>
-    </div>
+    <div class="header"><h1>ZeroLog</h1></div>
 
     <div class="tabs">
         <div class="tab active" id="tab-workout" onclick="showSection('workout')">Workout</div>
@@ -309,27 +167,21 @@
 
     <div id="section-workout">
         <div class="day-picker" id="dayPicker"></div>
-        
         <div class="day-title-container">
             <input type="text" id="day-label-input" placeholder="Today's Focus (e.g. Upper Body Pull)" onchange="saveDayLabel()">
         </div>
-
         <div class="add-ex-container">
             <input type="text" id="new-ex-name" placeholder="Add New Exercise...">
             <button onclick="addExercise()">ADD</button>
         </div>
-
         <div class="quick-select" id="quickSelect"></div>
-
         <div id="workoutArea"></div>
-
         <button class="btn-full" id="rest-btn-toggle" onclick="toggleRestDay()">Mark as Rest Day</button>
     </div>
 
     <div id="section-calculator" style="display:none;">
         <div class="exercise-card">
-            <h3 style="margin-top:0">Plate Calculator</h3>
-            <p style="color:var(--dim); font-size:12px;">Standard 20kg bar included.</p>
+            <h3>Plate Calculator</h3>
             <input type="number" id="target-weight" placeholder="Total Weight (kg)" style="width:100%; background:#111; border:1px solid #222; color:white; padding:15px; border-radius:8px; margin-bottom:15px;">
             <div id="calc-result" style="text-align:center; color:var(--accent); font-weight:bold; font-size:24px; margin-bottom:20px;"></div>
             <button onclick="calcPlates()" style="width:100%">Calculate Per Side</button>
@@ -338,7 +190,7 @@
 
     <div id="section-settings" style="display:none;">
         <div class="exercise-card">
-            <h3>App Control</h3>
+            <h3>ZeroLog Settings</h3>
             <button class="btn-full" style="background:#222; border: 1px solid #333; margin-bottom:15px;" onclick="exportData()">Export Data (JSON)</button>
             <button class="btn-full" style="background:var(--danger);" onclick="resetData()">Reset All Data</button>
         </div>
@@ -362,7 +214,6 @@
     </div>
 
     <script>
-        // State Management
         let currentDay = new Date().toLocaleDateString('en-US', { weekday: 'short' });
         let workouts = JSON.parse(localStorage.getItem('zerolog_data')) || [];
         let restDays = JSON.parse(localStorage.getItem('zerolog_rest_days')) || [];
@@ -372,39 +223,20 @@
         const daysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const quickExList = ['Bench Press', 'Squat', 'Deadlift', 'Shoulder Press', 'Lat Pulldown', 'Barbell Row', 'Leg Press', 'Bicep Curl'];
 
-        // Core Functions
         function init() {
-            const picker = document.getElementById('dayPicker');
-            picker.innerHTML = daysList.map(d => `
-                <div class="day ${d === currentDay ? 'active' : ''}" onclick="setDay('${d}')">
-                    ${d}
-                </div>
-            `).join('');
-
-            const qs = document.getElementById('quickSelect');
-            qs.innerHTML = quickExList.map(ex => `
-                <div class="q-btn" onclick="addExercise('${ex}')">${ex}</div>
-            `).join('');
-
+            document.getElementById('dayPicker').innerHTML = daysList.map(d => `<div class="day ${d === currentDay ? 'active' : ''}" onclick="setDay('${d}')">${d}</div>`).join('');
+            document.getElementById('quickSelect').innerHTML = quickExList.map(ex => `<div class="q-btn" onclick="addExercise('${ex}')">${ex}</div>`).join('');
             document.getElementById('day-label-input').value = dayLabels[currentDay] || '';
             render();
         }
 
-        function setDay(d) {
-            currentDay = d;
-            init();
-        }
-
-        function saveDayLabel() {
-            dayLabels[currentDay] = document.getElementById('day-label-input').value;
-            localStorage.setItem('zerolog_day_labels', JSON.stringify(dayLabels));
-        }
+        function setDay(d) { currentDay = d; init(); }
+        function saveDayLabel() { dayLabels[currentDay] = document.getElementById('day-label-input').value; localStorage.setItem('zerolog_day_labels', JSON.stringify(dayLabels)); }
 
         function showSection(s) {
             document.getElementById('section-workout').style.display = (s === 'workout') ? 'block' : 'none';
             document.getElementById('section-calculator').style.display = (s === 'calculator') ? 'block' : 'none';
             document.getElementById('section-settings').style.display = (s === 'settings') ? 'block' : 'none';
-            
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + s).classList.add('active');
         }
@@ -412,121 +244,63 @@
         function addExercise(name) {
             const input = document.getElementById('new-ex-name');
             const exName = name || input.value.trim();
-            
             if (exName) {
-                workouts.push({
-                    id: Date.now(),
-                    day: currentDay,
-                    name: exName,
-                    sets: [],
-                    feeling: ''
-                });
-                input.value = '';
-                save();
+                workouts.push({ id: Date.now(), day: currentDay, name: exName, sets: [], feeling: '' });
+                input.value = ''; save();
             }
         }
 
         function addSet(exId) {
             const w = document.getElementById(`w-${exId}`).value;
             const r = document.getElementById(`r-${exId}`).value;
-            
             if (w && r) {
-                const ex = workouts.find(w => w.id === exId);
-                ex.sets.push({ weight: w, reps: r });
-                save();
-                startTimer(90);
+                workouts.find(w => w.id === exId).sets.push({ weight: w, reps: r });
+                save(); startTimer(90);
             }
         }
 
-        function deleteSet(exId, index) {
-            const ex = workouts.find(w => w.id === exId);
-            ex.sets.splice(index, 1);
-            save();
-        }
-
-        function updateFeeling(exId, val) {
-            const ex = workouts.find(w => w.id === exId);
-            ex.feeling = val;
-            save();
-        }
+        function deleteSet(exId, index) { workouts.find(w => w.id === exId).sets.splice(index, 1); save(); }
+        function updateFeeling(exId, val) { workouts.find(w => w.id === exId).feeling = val; save(); }
 
         function toggleRestDay() {
-            if (restDays.includes(currentDay)) {
-                restDays = restDays.filter(d => d !== currentDay);
-            } else {
-                restDays.push(currentDay);
-            }
+            if (restDays.includes(currentDay)) restDays = restDays.filter(d => d !== currentDay);
+            else restDays.push(currentDay);
             localStorage.setItem('zerolog_rest_days', JSON.stringify(restDays));
             render();
         }
 
         function startTimer(seconds) {
             clearInterval(timerInterval);
-            const banner = document.getElementById('timer-banner');
-            const display = document.getElementById('timer-display');
-            banner.style.display = 'flex';
-
+            document.getElementById('timer-banner').style.display = 'flex';
             let remaining = seconds;
             const updateUI = () => {
-                let m = Math.floor(remaining / 60);
-                let s = remaining % 60;
-                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                let m = Math.floor(remaining / 60); let s = remaining % 60;
+                document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
             };
-
             updateUI();
             timerInterval = setInterval(() => {
-                remaining--;
-                updateUI();
-                
-                // Vibrate on final 3 seconds
-                if (remaining <= 3 && remaining > 0) {
-                    if (navigator.vibrate) navigator.vibrate(100);
-                }
-
+                remaining--; updateUI();
+                if (remaining <= 3 && remaining > 0) if (navigator.vibrate) navigator.vibrate(100);
                 if (remaining <= 0) stopTimer();
             }, 1000);
         }
 
-        function stopTimer() {
-            clearInterval(timerInterval);
-            document.getElementById('timer-banner').style.display = 'none';
-        }
-
-        function calcPlates() {
+        function stopTimer() { clearInterval(timerInterval); document.getElementById('timer-banner').style.display = 'none'; }
+        function calcPlates() { 
             const total = document.getElementById('target-weight').value;
-            const res = document.getElementById('calc-result');
-            if (total < 20) {
-                res.innerText = "Minimum 20kg (Bar)";
-            } else {
-                res.innerText = `${(total - 20) / 2} kg per side`;
-            }
+            document.getElementById('calc-result').innerText = total < 20 ? "Min 20kg" : `${(total - 20) / 2} kg per side`;
         }
 
-        function save() {
-            localStorage.setItem('zerolog_data', JSON.stringify(workouts));
-            render();
-        }
-
-        function resetData() {
-            if (confirm("ZeroLog: Are you sure? All exercises and labels will be wiped.")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
+        function save() { localStorage.setItem('zerolog_data', JSON.stringify(workouts)); render(); }
+        function resetData() { if (confirm("ZeroLog: Wipe all data?")) { localStorage.clear(); location.reload(); } }
         function exportData() {
             const blob = new Blob([JSON.stringify(workouts)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'zerolog_backup.json';
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zerolog_backup.json'; a.click();
         }
 
         function render() {
             const area = document.getElementById('workoutArea');
             const isRest = restDays.includes(currentDay);
-            
             document.getElementById('rest-btn-toggle').innerText = isRest ? "Resume Training" : "Mark as Rest Day";
             document.querySelector('.add-ex-container').style.display = isRest ? 'none' : 'flex';
             document.querySelector('.quick-select').style.display = isRest ? 'none' : 'flex';
@@ -537,52 +311,34 @@
                     <div class="exercise-card" style="text-align:center;">
                         <div style="font-size:40px; margin-bottom:10px;">🧘</div>
                         <h3 style="margin:0">Recovery Mode</h3>
-                        <p style="color:var(--dim); font-size:13px;">Rest is where the muscle grows.</p>
+                        <p style="color:var(--dim); font-size:13px;">Recovery is a part of training.</p>
                         <div class="recovery-grid">
                             <div class="recovery-tip"><strong>Hydration</strong>2-3L Water + Salt</div>
                             <div class="recovery-tip"><strong>Movement</strong>15m Light Walk</div>
                             <div class="recovery-tip"><strong>Nutrition</strong>High Protein Focus</div>
                             <div class="recovery-tip"><strong>Sleep</strong>Aim for 8+ Hours</div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
 
-            const dailyEx = workouts.filter(ex => ex.day === currentDay);
-            area.innerHTML = dailyEx.map(ex => `
+            area.innerHTML = workouts.filter(ex => ex.day === currentDay).map(ex => `
                 <div class="exercise-card">
-                    <div class="ex-header">
-                        <span>${ex.name}</span>
-                        <span class="delete-btn" onclick="workouts=workouts.filter(w=>w.id!=${ex.id});save();">✕</span>
-                    </div>
-                    
-                    <div id="sets-${ex.id}">
-                        ${ex.sets.map((s, i) => `
-                            <div class="set-row">
-                                <span>Set ${i+1}: <strong>${s.weight}kg</strong> x <strong>${s.reps}</strong></span>
-                                <span class="delete-btn" onclick="deleteSet(${ex.id}, ${i})">×</span>
-                            </div>
-                        `).join('')}
-                    </div>
-
+                    <div class="ex-header"><span>${ex.name}</span><span class="delete-btn" onclick="workouts=workouts.filter(w=>w.id!=${ex.id});save();">✕</span></div>
+                    ${ex.sets.map((s, i) => `<div class="set-row"><span>Set ${i+1}: <strong>${s.weight}kg</strong> x <strong>${s.reps}</strong></span><span class="delete-btn" onclick="deleteSet(${ex.id}, ${i})">×</span></div>`).join('')}
                     <div class="input-row">
                         <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal">
                         <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric">
                         <button onclick="addSet(${ex.id})">✓</button>
                     </div>
-
                     <select class="feel-select" onchange="updateFeeling(${ex.id}, this.value)">
                         <option value="">How did it feel?</option>
                         <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
                         <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
                         <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
                     </select>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
-
-        // Run
         init();
     </script>
 </body>

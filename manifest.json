@@ -8,7 +8,8 @@
   "background_color": "#000000",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
-  "categories": ["health", "fitness", "lifestyle"],
+  "categories": ["health", "fitness"],
+  "id": "/zerolog/",
   "icons": [
     {
       "src": "/zerolog/logo512.png",
@@ -25,15 +26,11 @@
       "form_factor": "narrow",
       "label": "Workout Tracking Screen"
     }
-  ]
-}
-
-  "id": "/zerolog/",
-  "iarc_rating_id": "e58c735d-9967-463e-9154-1234567890ab",
+  ],
   "related_applications": [
     {
       "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.bigviv.zerolog",
       "id": "com.bigviv.zerolog"
     }
   ]
+}

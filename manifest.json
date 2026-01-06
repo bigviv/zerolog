@@ -1,16 +1,29 @@
 {
-  "name": "ZeroLog Pro v5.3",
+  "name": "ZeroLog Workout Logger",
   "short_name": "ZeroLog",
+  "description": "A minimalist fitness tracker for progressive overload and strength training.",
   "start_url": "/zerolog/index.html",
   "scope": "/zerolog/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["health", "fitness", "lifestyle"],
   "icons": [
-  {
-    "src": "/zerolog/logo.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }
-]
+    {
+      "src": "/zerolog/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/zerolog/screenshot.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Workout Tracking Screen"
+    }
+  ]
 }

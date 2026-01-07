@@ -9,115 +9,157 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
-        :root {
-            --bg: #000;
-            --card: #0a0a0a;
-            --accent: #2563eb;
-            --success: #16a34a;
-            --text: #fff;
-            --dim: #888;
-            --danger: #b91c1c;
-        }
-
+        :root { --bg: #000; --card: #0a0a0a; --accent: #2563eb; --success: #16a34a; --text: #fff; --dim: #888; --danger: #b91c1c; }
         * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 140px; }
-
         h1 { font-style: italic; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; }
-
         .tabs { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #222; }
         .tab { padding: 12px 0; color: var(--dim); cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: bold; flex: 1; text-align: center; }
         .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-
         .day-picker { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
         .day { padding: 8px 16px; border-radius: 20px; background: var(--card); font-size: 12px; cursor: pointer; color: var(--dim); white-space: nowrap; }
         .day.active { background: var(--accent); color: white; }
-
-        .day-title-container input {
-            width: 100%; background: transparent; border: none; border-bottom: 1px solid #222;
-            color: var(--accent); font-size: 18px; font-weight: bold; padding: 10px 0; outline: none; margin-bottom: 15px;
-        }
-
+        .day-title-container input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #222; color: var(--accent); font-size: 18px; font-weight: bold; padding: 10px 0; outline: none; margin-bottom: 15px; }
         .add-ex-container { background: #111; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; gap: 10px; border: 1px solid #222; }
         .add-ex-container input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 14px; }
-
         .quick-select { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
         .q-btn { background: #222; color: #fff; border: 1px solid #333; padding: 6px 14px; border-radius: 6px; font-size: 11px; white-space: nowrap; cursor: pointer; }
-
         .exercise-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
         .ex-header { display: flex; justify-content: space-between; color: var(--accent); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
         .set-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: #111; border-radius: 6px; font-size: 14px; }
         .delete-btn { color: #ff4444; cursor: pointer; font-weight: bold; }
-
         .input-row { display: flex; gap: 10px; margin-top: 15px; }
-        .input-row input { background: #111; border: 1px solid #222; color: white; padding: 12px; border-radius: 8px; width: 100%; text-align: center; }
-
+        .input-row input { background: #111; border: 1px solid #222; color: white; padding: 14px; border-radius: 8px; width: 100%; text-align: center; font-size: 16px; }
+        .input-row input:focus { border-color: var(--accent); outline: none; }
         .feel-select { width: 100%; background: #111; border: 1px solid #222; color: var(--dim); padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 12px; }
-
         .recovery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
         .recovery-tip { background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; font-size: 12px; text-align: left; }
         .recovery-tip strong { display: block; color: var(--accent); margin-bottom: 5px; }
-
-        /* THE TIMER - Set above the Ad Block */
-        #timer-banner {
-            position: fixed; bottom: 75px; left: 10px; right: 10px; background: var(--accent); color: white;
-            padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 1001; border-radius: 12px;
-        }
-
+        #timer-banner { position: fixed; bottom: 75px; left: 10px; right: 10px; background: var(--accent); color: white; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 1001; border-radius: 12px; }
         button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-full { width: 100%; padding: 18px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
         .btn-success { background: var(--success); }
-
-        /* THE AD BLOCK - Fixed at the very bottom */
         .ad-container { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; height: 60px; text-align: center; z-index: 1000; border-top: 1px solid #222; padding-top: 5px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--dim); }
+        .empty-state-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
+        .empty-state h3 { color: var(--text); margin-bottom: 10px; }
+        .success-indicator { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; z-index: 2000; display: none; font-weight: bold; }
+        .history-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
+        .history-date { color: var(--accent); font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+        .history-exercise { padding: 8px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
+        .history-exercise:last-child { border-bottom: none; }
+        .history-exercise-name { color: var(--text); font-weight: bold; margin-bottom: 5px; }
+        .history-sets { color: var(--dim); font-size: 12px; }
+        .pr-badge { background: #fbbf24; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 5px; }
+        .stat-card { background: #111; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
+        .stat-label { font-size: 11px; color: var(--dim); text-transform: uppercase; margin-top: 5px; }
+        .plate-breakdown { background: #111; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .plate-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; color: var(--dim); font-size: 13px; }
+        .plate-item:last-child { border-bottom: none; }
+        .calc-input-group { margin-bottom: 15px; }
+        .calc-input-group label { display: block; color: var(--dim); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; }
+        .calc-input-group select, .calc-input-group input { width: 100%; background: #111; border: 1px solid #222; color: white; padding: 15px; border-radius: 8px; font-size: 16px; }
+        .timer-custom { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+        .timer-custom input { width: 80px; background: #111; border: 1px solid #222; color: white; padding: 8px; border-radius: 6px; text-align: center; }
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
+        .file-input-label { display: block; width: 100%; padding: 18px; background: #222; border: 1px solid #333; color: white; text-align: center; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 15px; }
+        .repeat-workout-btn { background: #16a34a; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
     <h1>ZeroLog</h1>
-
     <div class="tabs">
         <div class="tab active" id="tab-workout" onclick="showSection('workout')">Workout</div>
+        <div class="tab" id="tab-history" onclick="showSection('history')">History</div>
         <div class="tab" id="tab-calculator" onclick="showSection('calculator')">Calculator</div>
         <div class="tab" id="tab-settings" onclick="showSection('settings')">Settings</div>
     </div>
 
     <div id="section-workout">
         <div class="day-picker" id="dayPicker"></div>
-        <div class="day-title-container">
-            <input type="text" id="day-label-input" placeholder="Today's Focus..." onchange="saveDayLabel()">
-        </div>
-        <div class="add-ex-container">
-            <input type="text" id="new-ex-name" placeholder="Add New Exercise...">
-            <button onclick="addExercise()">ADD</button>
-        </div>
+        <div class="day-title-container"><input type="text" id="day-label-input" placeholder="Today's Focus..." onchange="saveDayLabel()"></div>
+        <button class="btn-full repeat-workout-btn" id="repeat-btn" onclick="repeatLastWorkout()" style="display:none;">🔄 Repeat Last Workout</button>
+        <div class="add-ex-container"><input type="text" id="new-ex-name" placeholder="Add New Exercise..."><button onclick="addExercise()" aria-label="Add exercise">ADD</button></div>
         <div class="quick-select" id="quickSelect"></div>
         <div id="workoutArea"></div>
-        
         <button class="btn-full btn-success" id="complete-btn" onclick="completeWorkout()" style="display:none;">Finish & Log Workout</button>
         <button class="btn-full" id="rest-btn-toggle" onclick="toggleRestDay()">Mark as Rest Day</button>
+    </div>
+
+    <div id="section-history" style="display:none;">
+        <div class="stat-card">
+            <div class="stat-value" id="total-workouts">0</div>
+            <div class="stat-label">Total Workouts</div>
+        </div>
+        <div id="historyArea"></div>
     </div>
 
     <div id="section-calculator" style="display:none;">
         <div class="exercise-card">
             <h3>Plate Calculator</h3>
-            <input type="number" id="target-weight" placeholder="Total Weight (kg)" style="width:100%; background:#111; border:1px solid #222; color:white; padding:15px; border-radius:8px; margin-bottom:15px;">
-            <div id="calc-result" style="text-align:center; color:var(--accent); font-weight:bold; font-size:24px; margin-bottom:20px;"></div>
+            <div class="calc-input-group">
+                <label>Bar Weight</label>
+                <select id="bar-weight">
+                    <option value="20">Olympic Bar (20kg)</option>
+                    <option value="15">Women's Bar (15kg)</option>
+                    <option value="10">Standard Bar (10kg)</option>
+                    <option value="7">Training Bar (7kg)</option>
+                </select>
+            </div>
+            <div class="calc-input-group">
+                <label>Total Weight</label>
+                <input type="number" id="target-weight" placeholder="Total Weight (kg)" inputmode="decimal">
+            </div>
+            <div id="calc-result" style="text-align:center; color:var(--accent); font-weight:bold; font-size:24px; margin:20px 0;"></div>
+            <div id="plate-breakdown"></div>
             <button onclick="calcPlates()" style="width:100%">Calculate Per Side</button>
+        </div>
+
+        <div class="exercise-card">
+            <h3>One Rep Max Calculator</h3>
+            <div class="calc-input-group">
+                <label>Weight Lifted (kg)</label>
+                <input type="number" id="orm-weight" placeholder="Weight" inputmode="decimal">
+            </div>
+            <div class="calc-input-group">
+                <label>Reps Completed</label>
+                <input type="number" id="orm-reps" placeholder="Reps" inputmode="numeric">
+            </div>
+            <div id="orm-result" style="text-align:center; color:var(--accent); font-weight:bold; font-size:24px; margin:20px 0;"></div>
+            <button onclick="calcORM()" style="width:100%">Calculate 1RM</button>
         </div>
     </div>
 
     <div id="section-settings" style="display:none;">
         <div class="exercise-card">
             <h3>ZeroLog Settings</h3>
-            <button class="btn-full" style="background:#222; border: 1px solid #333; margin-bottom:15px;" onclick="exportData()">Export Data (JSON)</button>
+            <button class="btn-full" style="background:#222; border: 1px solid #333; margin-bottom:15px;" onclick="exportData()">📥 Export Data (JSON)</button>
+            <div class="file-input-wrapper">
+                <input type="file" id="import-file" accept=".json" onchange="importData(event)">
+                <label for="import-file" class="file-input-label">📤 Import Data (JSON)</label>
+            </div>
+            <button class="btn-full" style="background:#16a34a; margin-bottom:15px;" onclick="downloadHTML()">💾 Download HTML File</button>
             <button class="btn-full" style="background:var(--danger);" onclick="resetData()">Reset All Data</button>
         </div>
     </div>
 
     <div id="timer-banner">
-        <div><div style="font-size:10px; opacity:0.8;">RESTING</div><div id="timer-display" style="font-size:24px; font-weight:900">0:00</div></div>
-        <div style="display:flex; gap:8px;"><button onclick="startTimer(60)">60s</button><button onclick="startTimer(180)">180s</button><button onclick="stopTimer()" style="background:#000">SKIP</button></div>
+        <div>
+            <div style="font-size:10px; opacity:0.8;">RESTING</div>
+            <div id="timer-display" style="font-size:24px; font-weight:900">0:00</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap: wrap;">
+            <button onclick="startTimer(60)">60s</button>
+            <button onclick="startTimer(90)">90s</button>
+            <button onclick="startTimer(180)">180s</button>
+            <button onclick="stopTimer()" style="background:#000">SKIP</button>
+        </div>
     </div>
+
+    <div id="success-indicator" class="success-indicator">✓ Set Added!</div>
 
     <div class="ad-container">
         <ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-9180492943097575" data-ad-slot="6115261796"></ins>
@@ -125,95 +167,456 @@
     </div>
 
     <script>
+        // ========== STATE MANAGEMENT ==========
         let currentDay = new Date().toLocaleDateString('en-US', { weekday: 'short' });
         let workouts = JSON.parse(localStorage.getItem('zerolog_data')) || [];
         let restDays = JSON.parse(localStorage.getItem('zerolog_rest_days')) || [];
         let dayLabels = JSON.parse(localStorage.getItem('zerolog_day_labels')) || {};
         let history = JSON.parse(localStorage.getItem('zerolog_history')) || [];
         let timerInterval;
+        let timerAudio = null;
 
         const daysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const quickExList = ['Bench Press', 'Squat', 'Deadlift', 'Shoulder Press', 'Lat Pulldown', 'Barbell Row', 'Leg Press', 'Bicep Curl'];
 
+        // ========== INITIALIZATION ==========
         function init() {
-            document.getElementById('dayPicker').innerHTML = daysList.map(d => `<div class="day ${d === currentDay ? 'active' : ''}" onclick="setDay('${d}')">${d}</div>`).join('');
-            document.getElementById('quickSelect').innerHTML = quickExList.map(ex => `<div class="q-btn" onclick="addExercise('${ex}')">${ex}</div>`).join('');
+            document.getElementById('dayPicker').innerHTML = daysList.map(d => 
+                `<div class="day ${d === currentDay ? 'active' : ''}" onclick="setDay('${d}')">${d}</div>`
+            ).join('');
+            document.getElementById('quickSelect').innerHTML = quickExList.map(ex => 
+                `<div class="q-btn" onclick="addExercise('${ex}')">${ex}</div>`
+            ).join('');
             document.getElementById('day-label-input').value = dayLabels[currentDay] || '';
+            
+            // Show repeat button if there's a last workout for this day
+            const lastWorkout = getLastWorkoutForDay(currentDay);
+            const repeatBtn = document.getElementById('repeat-btn');
+            if (lastWorkout && !restDays.includes(currentDay)) {
+                repeatBtn.style.display = 'block';
+            } else {
+                repeatBtn.style.display = 'none';
+            }
+            
             render();
         }
 
-        function setDay(d) { currentDay = d; init(); }
-        function saveDayLabel() { dayLabels[currentDay] = document.getElementById('day-label-input').value; localStorage.setItem('zerolog_day_labels', JSON.stringify(dayLabels)); }
+        // ========== KEYBOARD SUPPORT ==========
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const activeElement = document.activeElement;
+                
+                // Add exercise on Enter in new exercise input
+                if (activeElement.id === 'new-ex-name') {
+                    e.preventDefault();
+                    addExercise();
+                }
+                
+                // Add set on Enter in weight/reps inputs
+                if (activeElement.id && (activeElement.id.startsWith('w-') || activeElement.id.startsWith('r-'))) {
+                    e.preventDefault();
+                    const exId = parseInt(activeElement.id.split('-')[1]);
+                    addSet(exId);
+                }
+            }
+        });
 
+        // ========== DAY MANAGEMENT ==========
+        function setDay(d) { 
+            currentDay = d; 
+            init(); 
+        }
+        
+        function saveDayLabel() { 
+            dayLabels[currentDay] = document.getElementById('day-label-input').value; 
+            localStorage.setItem('zerolog_day_labels', JSON.stringify(dayLabels)); 
+        }
+
+        // ========== SECTION NAVIGATION ==========
         function showSection(s) {
             document.getElementById('section-workout').style.display = (s === 'workout') ? 'block' : 'none';
+            document.getElementById('section-history').style.display = (s === 'history') ? 'block' : 'none';
             document.getElementById('section-calculator').style.display = (s === 'calculator') ? 'block' : 'none';
             document.getElementById('section-settings').style.display = (s === 'settings') ? 'block' : 'none';
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + s).classList.add('active');
+            
+            if (s === 'history') {
+                renderHistory();
+            }
         }
 
+        // ========== EXERCISE MANAGEMENT ==========
         function addExercise(name) {
             const exName = name || document.getElementById('new-ex-name').value.trim();
             if (exName) {
                 workouts.push({ id: Date.now(), day: currentDay, name: exName, sets: [], feeling: '' });
-                document.getElementById('new-ex-name').value = ''; save();
+                document.getElementById('new-ex-name').value = ''; 
+                save();
+            }
+        }
+
+        function deleteExercise(exId, exName) {
+            if (confirm(`Delete "${exName}" and all its sets?`)) {
+                workouts = workouts.filter(w => w.id !== exId);
+                save();
             }
         }
 
         function addSet(exId) {
-            const w = document.getElementById(`w-${exId}`).value;
-            const r = document.getElementById(`r-${exId}`).value;
+            const wInput = document.getElementById(`w-${exId}`);
+            const rInput = document.getElementById(`r-${exId}`);
+            const w = wInput.value;
+            const r = rInput.value;
             if (w && r) {
                 workouts.find(w => w.id === exId).sets.push({ weight: w, reps: r });
-                save(); startTimer(90);
+                save(); 
+                showSuccessIndicator();
+                startTimer(90);
+                // Select all text for easy editing
+                wInput.select();
+                wInput.focus();
             }
         }
 
+        function deleteSet(exId, index) { 
+            workouts.find(w => w.id === exId).sets.splice(index, 1); 
+            save(); 
+        }
+
+        function updateFeeling(exId, val) { 
+            workouts.find(w => w.id === exId).feeling = val; 
+            save(); 
+        }
+
+        // ========== WORKOUT COMPLETION ==========
         function completeWorkout() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#2563eb', '#ffffff'] });
-            history.push({ date: new Date().toISOString(), label: dayLabels[currentDay] || currentDay, exercises: workouts.filter(ex => ex.day === currentDay) });
+            confetti({ 
+                particleCount: 150, 
+                spread: 70, 
+                origin: { y: 0.6 }, 
+                colors: ['#2563eb', '#ffffff'] 
+            });
+            
+            history.push({ 
+                date: new Date().toISOString(), 
+                label: dayLabels[currentDay] || currentDay, 
+                exercises: workouts.filter(ex => ex.day === currentDay) 
+            });
             localStorage.setItem('zerolog_history', JSON.stringify(history));
+            
             workouts = workouts.filter(ex => ex.day !== currentDay);
             save();
         }
 
-        function deleteSet(exId, index) { workouts.find(w => w.id === exId).sets.splice(index, 1); save(); }
-        function updateFeeling(exId, val) { workouts.find(w => w.id === exId).feeling = val; save(); }
+        function repeatLastWorkout() {
+            const lastWorkout = getLastWorkoutForDay(currentDay);
+            if (lastWorkout && confirm('Load exercises from your last ' + currentDay + ' workout?')) {
+                lastWorkout.exercises.forEach(ex => {
+                    workouts.push({
+                        id: Date.now() + Math.random(),
+                        day: currentDay,
+                        name: ex.name,
+                        sets: [],
+                        feeling: ''
+                    });
+                });
+                save();
+            }
+        }
 
+        function getLastWorkoutForDay(day) {
+            const dayWorkouts = history.filter(h => {
+                const date = new Date(h.date);
+                const workoutDay = date.toLocaleDateString('en-US', { weekday: 'short' });
+                return workoutDay === day;
+            });
+            return dayWorkouts.length > 0 ? dayWorkouts[dayWorkouts.length - 1] : null;
+        }
+
+        // ========== REST DAY ==========
         function toggleRestDay() {
-            if (restDays.includes(currentDay)) restDays = restDays.filter(d => d !== currentDay);
-            else restDays.push(currentDay);
+            if (restDays.includes(currentDay)) {
+                restDays = restDays.filter(d => d !== currentDay);
+            } else {
+                restDays.push(currentDay);
+            }
             localStorage.setItem('zerolog_rest_days', JSON.stringify(restDays));
             render();
         }
 
+        // ========== TIMER ==========
         function startTimer(seconds) {
             clearInterval(timerInterval);
             document.getElementById('timer-banner').style.display = 'flex';
             let remaining = seconds;
+            
+            // Update title immediately
+            updateTimerDisplay(remaining);
+            
             timerInterval = setInterval(() => {
                 remaining--;
-                let m = Math.floor(remaining / 60); let s = remaining % 60;
-                document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                if (remaining <= 3 && remaining > 0) if (navigator.vibrate) navigator.vibrate(100);
-                if (remaining <= 0) stopTimer();
+                updateTimerDisplay(remaining);
+                
+                if (remaining <= 3 && remaining > 0) {
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
+                
+                if (remaining <= 0) {
+                    stopTimer();
+                    playTimerSound();
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                }
             }, 1000);
         }
 
-        function stopTimer() { clearInterval(timerInterval); document.getElementById('timer-banner').style.display = 'none'; }
+        function updateTimerDisplay(remaining) {
+            let m = Math.floor(remaining / 60);
+            let s = remaining % 60;
+            const display = `${m}:${s < 10 ? '0' : ''}${s}`;
+            document.getElementById('timer-display').innerText = display;
+            document.title = remaining > 0 ? `(${display}) ZeroLog` : 'ZeroLog';
+        }
+
+        function stopTimer() { 
+            clearInterval(timerInterval); 
+            document.getElementById('timer-banner').style.display = 'none';
+            document.title = 'ZeroLog';
+        }
+
+        function playTimerSound() {
+            // Create a simple beep sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // ========== CALCULATOR ==========
         function calcPlates() { 
-            const total = document.getElementById('target-weight').value;
-            document.getElementById('calc-result').innerText = total < 20 ? "Min 20kg" : `${(total - 20) / 2} kg/side`;
+            const total = parseFloat(document.getElementById('target-weight').value);
+            const barWeight = parseFloat(document.getElementById('bar-weight').value);
+            const resultDiv = document.getElementById('calc-result');
+            const breakdownDiv = document.getElementById('plate-breakdown');
+            
+            if (!total || total < barWeight) {
+                resultDiv.innerText = `Min ${barWeight}kg`;
+                breakdownDiv.innerHTML = '';
+                return;
+            }
+            
+            const perSide = (total - barWeight) / 2;
+            resultDiv.innerText = `${perSide.toFixed(1)} kg/side`;
+            
+            // Calculate plate breakdown
+            const plates = [25, 20, 15, 10, 5, 2.5, 1.25, 0.5];
+            let remaining = perSide;
+            let breakdown = [];
+            
+            for (let plate of plates) {
+                let count = Math.floor(remaining / plate);
+                if (count > 0) {
+                    breakdown.push({ weight: plate, count: count });
+                    remaining -= count * plate;
+                }
+            }
+            
+            if (breakdown.length > 0) {
+                breakdownDiv.innerHTML = '<div class="plate-breakdown"><strong style="color: var(--accent); display: block; margin-bottom: 10px;">Plates Per Side:</strong>' +
+                    breakdown.map(p => `<div class="plate-item"><span>${p.count}x ${p.weight}kg</span></div>`).join('') +
+                    '</div>';
+            } else {
+                breakdownDiv.innerHTML = '';
+            }
         }
 
-        function save() { localStorage.setItem('zerolog_data', JSON.stringify(workouts)); render(); }
-        function resetData() { if (confirm("ZeroLog: Wipe all data?")) { localStorage.clear(); location.reload(); } }
+        function calcORM() {
+            const weight = parseFloat(document.getElementById('orm-weight').value);
+            const reps = parseInt(document.getElementById('orm-reps').value);
+            const resultDiv = document.getElementById('orm-result');
+            
+            if (!weight || !reps || reps < 1) {
+                resultDiv.innerText = 'Enter valid values';
+                return;
+            }
+            
+            // Epley Formula: 1RM = weight × (1 + reps/30)
+            const oneRM = weight * (1 + reps / 30);
+            resultDiv.innerText = `${oneRM.toFixed(1)} kg`;
+        }
+
+        // ========== HISTORY ==========
+        function renderHistory() {
+            const area = document.getElementById('historyArea');
+            document.getElementById('total-workouts').innerText = history.length;
+            
+            if (history.length === 0) {
+                area.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><h3>No workout history yet</h3><p>Complete your first workout to see it here!</p></div>';
+                return;
+            }
+            
+            // Sort history by date descending
+            const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            area.innerHTML = sortedHistory.map(workout => {
+                const date = new Date(workout.date);
+                const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-date">${dateStr} ${workout.label ? '- ' + workout.label : ''}</div>
+                        ${workout.exercises.map(ex => {
+                            const totalVolume = ex.sets.reduce((sum, set) => sum + (parseFloat(set.weight) * parseInt(set.reps)), 0);
+                            const isPR = checkIfPR(ex.name, ex.sets, workout.date);
+                            
+                            return `
+                                <div class="history-exercise">
+                                    <div class="history-exercise-name">
+                                        ${ex.name}
+                                        ${isPR ? '<span class="pr-badge">PR</span>' : ''}
+                                    </div>
+                                    <div class="history-sets">
+                                        ${ex.sets.map((s, i) => `${s.weight}kg × ${s.reps}`).join(' • ')}
+                                        ${totalVolume > 0 ? ` • Volume: ${totalVolume.toFixed(0)}kg` : ''}
+                                    </div>
+                                    ${ex.feeling ? `<div class="history-sets">Felt: ${ex.feeling}</div>` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkIfPR(exerciseName, sets, currentDate) {
+            // Find max weight for this exercise
+            const maxWeight = Math.max(...sets.map(s => parseFloat(s.weight)));
+            
+            // Check previous workouts for same exercise
+            const previousWorkouts = history.filter(h => new Date(h.date) < new Date(currentDate));
+            
+            for (let workout of previousWorkouts) {
+                for (let ex of workout.exercises) {
+                    if (ex.name === exerciseName) {
+                        const prevMax = Math.max(...ex.sets.map(s => parseFloat(s.weight)));
+                        if (prevMax >= maxWeight) {
+                            return false; // Not a PR
+                        }
+                    }
+                }
+            }
+            
+            return previousWorkouts.some(w => w.exercises.some(e => e.name === exerciseName));
+        }
+
+        // ========== UI FEEDBACK ==========
+        function showSuccessIndicator() {
+            const indicator = document.getElementById('success-indicator');
+            indicator.style.display = 'block';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 1500);
+        }
+
+        // ========== STORAGE & DATA ==========
+        function save() { 
+            localStorage.setItem('zerolog_data', JSON.stringify(workouts)); 
+            render(); 
+        }
+        
+        function resetData() { 
+            if (confirm("ZeroLog: Wipe all data? This cannot be undone!")) { 
+                localStorage.clear(); 
+                location.reload(); 
+            } 
+        }
+        
         function exportData() {
-            const blob = new Blob([JSON.stringify({workouts, history})], {type: 'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zerolog_export.json'; a.click();
+            const timestamp = new Date().toISOString().split('T')[0];
+            const data = {
+                workouts: workouts,
+                history: history,
+                restDays: restDays,
+                dayLabels: dayLabels,
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(blob); 
+            a.download = `zerolog_export_${timestamp}.json`; 
+            a.click();
         }
 
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], {type: 'text/html'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'index.html';
+            a.click();
+            alert('HTML file downloaded! You can now use this offline.');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm('Import data? This will merge with your current data. Export first if you want to backup!')) {
+                        // Merge workouts
+                        if (data.workouts) {
+                            workouts = [...workouts, ...data.workouts];
+                            localStorage.setItem('zerolog_data', JSON.stringify(workouts));
+                        }
+                        
+                        // Merge history
+                        if (data.history) {
+                            history = [...history, ...data.history];
+                            localStorage.setItem('zerolog_history', JSON.stringify(history));
+                        }
+                        
+                        // Merge rest days
+                        if (data.restDays) {
+                            restDays = [...new Set([...restDays, ...data.restDays])];
+                            localStorage.setItem('zerolog_rest_days', JSON.stringify(restDays));
+                        }
+                        
+                        // Merge day labels
+                        if (data.dayLabels) {
+                            dayLabels = {...dayLabels, ...data.dayLabels};
+                            localStorage.setItem('zerolog_day_labels', JSON.stringify(dayLabels));
+                        }
+                        
+                        alert('Data imported successfully!');
+                        init();
+                    }
+                } catch (error) {
+                    alert('Error importing data. Please check the file format.');
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // ========== RENDERING ==========
         function render() {
             const area = document.getElementById('workoutArea');
             const isRest = restDays.includes(currentDay);
@@ -224,25 +627,68 @@
             document.querySelector('.quick-select').style.display = isRest ? 'none' : 'flex';
             document.querySelector('.day-title-container').style.display = isRest ? 'none' : 'block';
             document.getElementById('complete-btn').style.display = (dailyEx.length > 0 && !isRest) ? 'block' : 'none';
+            
+            const repeatBtn = document.getElementById('repeat-btn');
+            const lastWorkout = getLastWorkoutForDay(currentDay);
+            if (lastWorkout && !isRest && dailyEx.length === 0) {
+                repeatBtn.style.display = 'block';
+            } else {
+                repeatBtn.style.display = 'none';
+            }
 
             if (isRest) {
-                area.innerHTML = `<div class="exercise-card" style="text-align:center;"><div style="font-size:40px; margin-bottom:10px;">🧘</div><h3>Recovery Mode</h3><div class="recovery-grid"><div class="recovery-tip"><strong>Hydration</strong>2-3L Water</div><div class="recovery-tip"><strong>Movement</strong>15m Walk</div><div class="recovery-tip"><strong>Nutrition</strong>High Protein</div><div class="recovery-tip"><strong>Sleep</strong>8+ Hours</div></div></div>`;
+                area.innerHTML = `
+                    <div class="exercise-card" style="text-align:center;">
+                        <div style="font-size:40px; margin-bottom:10px;">🧘</div>
+                        <h3>Recovery Mode</h3>
+                        <div class="recovery-grid">
+                            <div class="recovery-tip"><strong>Hydration</strong>2-3L Water</div>
+                            <div class="recovery-tip"><strong>Movement</strong>15m Walk</div>
+                            <div class="recovery-tip"><strong>Nutrition</strong>High Protein</div>
+                            <div class="recovery-tip"><strong>Sleep</strong>8+ Hours</div>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            if (dailyEx.length === 0) {
+                area.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💪</div>
+                        <h3>Ready to train?</h3>
+                        <p>Add an exercise above or select from quick options to get started.</p>
+                    </div>`;
                 return;
             }
 
             area.innerHTML = dailyEx.map(ex => `
                 <div class="exercise-card">
-                    <div class="ex-header"><span>${ex.name}</span><span class="delete-btn" onclick="workouts=workouts.filter(w=>w.id!=${ex.id});save();">✕</span></div>
-                    ${ex.sets.map((s, i) => `<div class="set-row"><span>Set ${i+1}: <strong>${s.weight}kg</strong> x <strong>${s.reps}</strong></span><span class="delete-btn" onclick="deleteSet(${ex.id}, ${i})">×</span></div>`).join('')}
-                    <div class="input-row"><input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal"><input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric"><button onclick="addSet(${ex.id})">✓</button></div>
-                    <select class="feel-select" onchange="updateFeeling(${ex.id}, this.value)">
+                    <div class="ex-header">
+                        <span>${ex.name}</span>
+                        <span class="delete-btn" onclick="deleteExercise(${ex.id}, '${ex.name.replace(/'/g, "\\'")}');" aria-label="Delete exercise">✕</span>
+                    </div>
+                    ${ex.sets.map((s, i) => `
+                        <div class="set-row">
+                            <span>Set ${i+1}: <strong>${s.weight}kg</strong> x <strong>${s.reps}</strong></span>
+                            <span class="delete-btn" onclick="deleteSet(${ex.id}, ${i})" aria-label="Delete set">×</span>
+                        </div>
+                    `).join('')}
+                    <div class="input-row">
+                        <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" aria-label="Weight in kg">
+                        <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" aria-label="Number of reps">
+                        <button onclick="addSet(${ex.id})" aria-label="Add set">✓</button>
+                    </div>
+                    <select class="feel-select" onchange="updateFeeling(${ex.id}, this.value)" aria-label="How did it feel">
                         <option value="">How did it feel?</option>
                         <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
                         <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
                         <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
                     </select>
-                </div>`).join('');
+                </div>
+            `).join('');
         }
+
+        // ========== INITIALIZE APP ==========
         init();
     </script>
 </body>

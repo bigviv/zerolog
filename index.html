@@ -20,9 +20,8 @@
         }
 
         * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 120px; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 140px; }
 
-        .header { margin-bottom: 20px; }
         h1 { font-style: italic; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; }
 
         .tabs { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #222; }
@@ -58,8 +57,9 @@
         .recovery-tip { background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; font-size: 12px; text-align: left; }
         .recovery-tip strong { display: block; color: var(--accent); margin-bottom: 5px; }
 
+        /* THE TIMER - Set above the Ad Block */
         #timer-banner {
-            position: fixed; bottom: 70px; left: 10px; right: 10px; background: var(--accent); color: white;
+            position: fixed; bottom: 75px; left: 10px; right: 10px; background: var(--accent); color: white;
             padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 1001; border-radius: 12px;
         }
 
@@ -67,12 +67,13 @@
         .btn-full { width: 100%; padding: 18px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
         .btn-success { background: var(--success); }
 
+        /* THE AD BLOCK - Fixed at the very bottom */
         .ad-container { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; height: 60px; text-align: center; z-index: 1000; border-top: 1px solid #222; padding-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="header"><h1>ZeroLog</h1></div>
+    <h1>ZeroLog</h1>
 
     <div class="tabs">
         <div class="tab active" id="tab-workout" onclick="showSection('workout')">Workout</div>
@@ -93,7 +94,6 @@
         <div id="workoutArea"></div>
         
         <button class="btn-full btn-success" id="complete-btn" onclick="completeWorkout()" style="display:none;">Finish & Log Workout</button>
-        
         <button class="btn-full" id="rest-btn-toggle" onclick="toggleRestDay()">Mark as Rest Day</button>
     </div>
 
@@ -154,11 +154,10 @@
         }
 
         function addExercise(name) {
-            const input = document.getElementById('new-ex-name');
-            const exName = name || input.value.trim();
+            const exName = name || document.getElementById('new-ex-name').value.trim();
             if (exName) {
                 workouts.push({ id: Date.now(), day: currentDay, name: exName, sets: [], feeling: '' });
-                input.value = ''; save();
+                document.getElementById('new-ex-name').value = ''; save();
             }
         }
 
@@ -173,15 +172,8 @@
 
         function completeWorkout() {
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#2563eb', '#ffffff'] });
-            const session = {
-                date: new Date().toISOString(),
-                label: dayLabels[currentDay] || currentDay,
-                exercises: workouts.filter(ex => ex.day === currentDay)
-            };
-            history.push(session);
+            history.push({ date: new Date().toISOString(), label: dayLabels[currentDay] || currentDay, exercises: workouts.filter(ex => ex.day === currentDay) });
             localStorage.setItem('zerolog_history', JSON.stringify(history));
-            
-            // Clear current day's exercises for tomorrow
             workouts = workouts.filter(ex => ex.day !== currentDay);
             save();
         }
@@ -219,7 +211,7 @@
         function resetData() { if (confirm("ZeroLog: Wipe all data?")) { localStorage.clear(); location.reload(); } }
         function exportData() {
             const blob = new Blob([JSON.stringify({workouts, history})], {type: 'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zerolog_full_export.json'; a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zerolog_export.json'; a.click();
         }
 
         function render() {

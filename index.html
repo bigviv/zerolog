@@ -286,6 +286,16 @@
 
         // ========== WORKOUT COMPLETION ==========
         function completeWorkout() {
+            const dailyEx = workouts.filter(ex => ex.day === currentDay);
+            
+            // Only complete exercises that have sets logged
+            const completedExercises = dailyEx.filter(ex => ex.sets.length > 0);
+            
+            if (completedExercises.length === 0) {
+                alert('Add some sets before completing your workout!');
+                return;
+            }
+            
             confetti({ 
                 particleCount: 150, 
                 spread: 70, 
@@ -296,12 +306,22 @@
             history.push({ 
                 date: new Date().toISOString(), 
                 label: dayLabels[currentDay] || currentDay, 
-                exercises: workouts.filter(ex => ex.day === currentDay) 
+                exercises: completedExercises
             });
             localStorage.setItem('zerolog_history', JSON.stringify(history));
             
-            workouts = workouts.filter(ex => ex.day !== currentDay);
+            // Remove only the exercises that were completed (had sets)
+            const completedIds = completedExercises.map(ex => ex.id);
+            workouts = workouts.map(ex => {
+                if (completedIds.includes(ex.id)) {
+                    // Clear the sets but keep the exercise for next time
+                    return { ...ex, sets: [], feeling: '' };
+                }
+                return ex;
+            });
+            
             save();
+            alert('Workout logged! Exercises reset and ready for next session.');
         }
 
         function repeatLastWorkout() {
@@ -618,7 +638,7 @@
             document.querySelector('.add-ex-container').style.display = isRest ? 'none' : 'flex';
             document.querySelector('.quick-select').style.display = isRest ? 'none' : 'flex';
             document.querySelector('.day-title-container').style.display = isRest ? 'none' : 'block';
-            document.getElementById('complete-btn').style.display = (dailyEx.length > 0 && !isRest) ? 'block' : 'none';
+            document.getElementById('complete-btn').style.display = (dailyEx.length > 0 && dailyEx.some(ex => ex.sets.length > 0) && !isRest) ? 'block' : 'none';
             
             const repeatBtn = document.getElementById('repeat-btn');
             const lastWorkout = getLastWorkoutForDay(currentDay);

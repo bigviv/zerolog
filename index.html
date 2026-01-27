@@ -4,24 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZeroLog</title>
-    <link rel="manifest" href="/zerolog/manifest.json">
     <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="/zerolog/logo512.png">
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/zerolog/sw.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Failed', err));
-            });
-        }
-    </script>
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9180492943097575" crossorigin="anonymous"></script>
     
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9180492943097575" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -29,6 +14,24 @@
         * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 20px; }
         h1 { font-style: italic; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; }
+        
+        /* NEW FEATURE 5: Workout Duration Timer */
+        .workout-timer { 
+            position: fixed; 
+            top: 10px; 
+            right: 10px; 
+            background: rgba(37, 99, 235, 0.2); 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: var(--accent); 
+            border: 1px solid var(--accent);
+            z-index: 100;
+            display: none;
+        }
+        .workout-timer.active { display: block; }
+        
         .tabs { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #222; }
         .tab { padding: 12px 0; color: var(--dim); cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: bold; flex: 1; text-align: center; }
         .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
@@ -40,11 +43,75 @@
         .add-ex-container input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 14px; }
         .quick-select { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
         .q-btn { background: #222; color: #fff; border: 1px solid #333; padding: 6px 14px; border-radius: 6px; font-size: 11px; white-space: nowrap; cursor: pointer; }
-        .exercise-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
+        .exercise-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; position: relative; }
+        
+        /* NEW FEATURE 3: Volume Per Exercise */
+        .ex-volume { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            color: var(--success); 
+            font-size: 11px; 
+            font-weight: bold;
+            background: rgba(22, 163, 74, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        /* NEW FEATURE 2: Last Workout Reference */
+        .last-workout-ref {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: var(--dim);
+        }
+        .last-workout-ref-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .last-workout-ref-content {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #222;
+            display: none;
+        }
+        .last-workout-ref-content.expanded {
+            display: block;
+        }
+        
         .ex-header { display: flex; justify-content: space-between; color: var(--accent); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
         .set-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: #111; border-radius: 6px; font-size: 14px; }
         .delete-btn { color: #ff4444; cursor: pointer; font-weight: bold; }
         .input-row { display: flex; gap: 10px; margin-top: 15px; }
+        
+        /* NEW FEATURE 1: Weight Adjustment Buttons */
+        .weight-input-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+        }
+        .weight-adjust-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: var(--accent);
+            padding: 14px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 45px;
+        }
+        .weight-adjust-btn:active {
+            background: #222;
+        }
+        
         .input-row input { background: #111; border: 1px solid #222; color: white; padding: 14px; border-radius: 8px; width: 100%; text-align: center; font-size: 16px; }
         .input-row input:focus { border-color: var(--accent); outline: none; }
         .input-row input.input-error { border-color: var(--danger); }
@@ -78,6 +145,29 @@
         .calc-input-group { margin-bottom: 15px; }
         .calc-input-group label { display: block; color: var(--dim); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; }
         .calc-input-group select, .calc-input-group input { width: 100%; background: #111; border: 1px solid #222; color: white; padding: 15px; border-radius: 8px; font-size: 16px; }
+        
+        /* NEW FEATURE 4: Auto-start Timer Checkbox */
+        .settings-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #111;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        .settings-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .settings-checkbox label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
         .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
         .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
         .file-input-label { display: block; width: 100%; padding: 18px; background: #222; border: 1px solid #333; color: white; text-align: center; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 15px; }
@@ -105,6 +195,9 @@
     </style>
 </head>
 <body>
+
+    <!-- NEW FEATURE 5: Workout Duration Timer Display -->
+    <div class="workout-timer" id="workout-timer">🕐 0:00</div>
 
     <h1>ZeroLog</h1>
     <div class="tabs">
@@ -184,6 +277,13 @@
                 <label>Default Rest Timer (seconds)</label>
                 <input type="number" id="default-timer" placeholder="90" value="90" min="30" max="300">
             </div>
+            
+            <!-- NEW FEATURE 4: Auto-start Timer Checkbox -->
+            <div class="settings-checkbox" onclick="toggleAutoStartTimer()">
+                <input type="checkbox" id="auto-start-timer" onchange="saveAutoStartTimer()">
+                <label for="auto-start-timer">Auto-start timer after each set</label>
+            </div>
+            
             <button onclick="saveTimerSettings()" style="width:100%; margin-bottom: 20px;">Save Timer Settings</button>
         </div>
 
@@ -267,11 +367,16 @@
     </div>
 
     <div id="success-indicator" class="success-indicator">✓ Set Added!</div>
-
     <script>
         let currentDay = new Date().toLocaleDateString('en-US', { weekday: 'short' });
         let workouts = [], restDays = [], dayLabels = {}, history = [], customExercises = [];
         let timerInterval, undoStack = [], defaultTimer = 90, exerciseDatabase = [], filteredExercises = [];
+        
+        // NEW FEATURES: Additional variables
+        let workoutStartTime = null;
+        let workoutTimerInterval = null;
+        let autoStartTimer = false;
+        
         const daysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const quickExList = ['Bench Press', 'Squat', 'Deadlift', 'Shoulder Press', 'Lat Pulldown', 'Barbell Row', 'Leg Press', 'Bicep Curl'];
         const muscleGroups = {
@@ -290,9 +395,84 @@
                 history = JSON.parse(localStorage.getItem('zerolog_history')) || [];
                 customExercises = JSON.parse(localStorage.getItem('zerolog_custom_exercises')) || [];
                 defaultTimer = parseInt(localStorage.getItem('zerolog_default_timer')) || 90;
+                autoStartTimer = JSON.parse(localStorage.getItem('zerolog_auto_start_timer')) || false;
             } catch (e) {
                 console.error('Error loading data:', e);
             }
+        }
+
+        // NEW FEATURE 5: Workout Duration Timer Functions
+        function startWorkoutTimer() {
+            if (workoutStartTime) return; // Already started
+            workoutStartTime = Date.now();
+            const timerDisplay = document.getElementById('workout-timer');
+            timerDisplay.classList.add('active');
+            
+            workoutTimerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - workoutStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                timerDisplay.textContent = `🕐 ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function stopWorkoutTimer() {
+            if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+            workoutStartTime = null;
+            workoutTimerInterval = null;
+            document.getElementById('workout-timer').classList.remove('active');
+        }
+
+        // NEW FEATURE 2: Get Last Workout for Specific Exercise
+        function getLastWorkoutForExercise(exName) {
+            const dayWorkouts = history.filter(h => {
+                const date = new Date(h.date);
+                const workoutDay = date.toLocaleDateString('en-US', {weekday: 'short'});
+                return workoutDay === currentDay;
+            }).sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            for (let workout of dayWorkouts) {
+                const exercise = workout.exercises.find(e => e.name === exName);
+                if (exercise && exercise.sets.length > 0) return exercise;
+            }
+            return null;
+        }
+
+        // NEW FEATURE 2: Toggle Last Workout Reference Display
+        function toggleLastWorkoutRef(exId) {
+            const content = document.getElementById(`last-workout-${exId}`);
+            if (content) {
+                content.classList.toggle('expanded');
+            }
+        }
+
+        // NEW FEATURE 1: Weight Adjustment Functions
+        function adjustWeight(exId, amount) {
+            const input = document.getElementById(`w-${exId}`);
+            const currentValue = parseFloat(input.value) || 0;
+            const newValue = Math.max(0, currentValue + amount);
+            input.value = newValue % 1 === 0 ? newValue : newValue.toFixed(1);
+            
+            if (navigator.vibrate) navigator.vibrate(10);
+        }
+
+        // NEW FEATURE 3: Calculate Exercise Volume
+        function calculateExerciseVolume(sets) {
+            return sets.reduce((total, set) => total + (parseFloat(set.weight) * parseInt(set.reps)), 0);
+        }
+
+        // NEW FEATURE 4: Auto-start Timer Functions
+        function toggleAutoStartTimer() {
+            const checkbox = document.getElementById('auto-start-timer');
+            checkbox.checked = !checkbox.checked;
+            saveAutoStartTimer();
+        }
+
+        function saveAutoStartTimer() {
+            autoStartTimer = document.getElementById('auto-start-timer').checked;
+            try {
+                localStorage.setItem('zerolog_auto_start_timer', JSON.stringify(autoStartTimer));
+            } catch(e) {}
         }
 
         function init() {
@@ -302,6 +482,7 @@
             renderCustomExercises();
             document.getElementById('day-label-input').value = dayLabels[currentDay] || '';
             document.getElementById('default-timer').value = defaultTimer;
+            document.getElementById('auto-start-timer').checked = autoStartTimer;
             const lastWorkout = getLastWorkoutForDay(currentDay);
             const repeatBtn = document.getElementById('repeat-btn');
             repeatBtn.style.display = (lastWorkout && !restDays.includes(currentDay)) ? 'block' : 'none';
@@ -384,6 +565,7 @@
                 workouts.push({ id: Date.now(), day: currentDay, name: exName, sets: [], feeling: '' });
                 document.getElementById('new-ex-name').value = ''; 
                 save();
+                startWorkoutTimer(); // NEW: Start workout timer when first exercise added
             }
         }
         
@@ -416,9 +598,14 @@
             workouts.find(w => w.id === exId).sets.push({weight: weight, reps: reps});
             save();
             showSuccessIndicator();
-            startTimer(defaultTimer);
-            wInput.value = '';
-            rInput.value = '';
+            
+            // NEW FEATURE 4: Auto-start timer if enabled
+            if (autoStartTimer) {
+                startTimer(defaultTimer);
+            }
+            
+            wInput.value = weight;
+            rInput.value = reps;
             wInput.focus();
         }
         
@@ -467,6 +654,9 @@
                 alert('Add some sets before completing your workout!');
                 return;
             }
+            
+            stopWorkoutTimer(); // NEW: Stop workout timer
+            
             confetti({
                 particleCount: 150,
                 spread: 70,
@@ -524,6 +714,7 @@
                 restDays = restDays.filter(d => d !== currentDay);
             } else {
                 restDays.push(currentDay);
+                stopWorkoutTimer(); // NEW: Stop timer on rest day
             }
             try {
                 localStorage.setItem('zerolog_rest_days', JSON.stringify(restDays));
@@ -917,8 +1108,9 @@
                     dayLabels,
                     customExercises,
                     defaultTimer,
+                    autoStartTimer,
                     exportDate: new Date().toISOString(),
-                    version: '2.0'
+                    version: '2.1'
                 };
                 const b = new Blob([JSON.stringify(d, null, 2)], {type: 'application/json'});
                 const a = document.createElement('a');
@@ -979,6 +1171,10 @@
                         if(d.defaultTimer) {
                             defaultTimer = d.defaultTimer;
                             localStorage.setItem('zerolog_default_timer', defaultTimer);
+                        }
+                        if(d.autoStartTimer !== undefined) {
+                            autoStartTimer = d.autoStartTimer;
+                            localStorage.setItem('zerolog_auto_start_timer', JSON.stringify(autoStartTimer));
                         }
                         alert('Data imported successfully!');
                         init();
@@ -1166,7 +1362,50 @@
             }
             const aiInsights = renderAIInsights();
             a.innerHTML = aiInsights || '';
-            a.innerHTML += dailyEx.map(ex => `<div class="exercise-card"><div class="ex-header"><span>${ex.name}</span><span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');" aria-label="Delete exercise">✕</span></div>${ex.sets.map((s, i) => `<div class="set-row">Set ${i + 1}: ${s.weight}kg × ${s.reps}<span class="delete-btn" onclick="deleteSet(${ex.id},${i})">✕</span></div>`).join('')}<div class="input-row"><input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" aria-label="Weight in kg" step="0.5"><input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" aria-label="Number of reps" step="1"><button onclick="addSet(${ex.id})" aria-label="Add set">✓</button></div><select class="feel-select" onchange="updateFeeling(${ex.id},this.value)" aria-label="How did it feel"><option value="">How did it feel?</option><option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option><option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option><option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option></select></div>`).join('');
+            
+            // NEW: Enhanced exercise card rendering with all 5 features
+            a.innerHTML += dailyEx.map(ex => {
+                const lastWorkout = getLastWorkoutForExercise(ex.name);
+                const volume = calculateExerciseVolume(ex.sets);
+                const lastSet = ex.sets.length > 0 ? ex.sets[ex.sets.length - 1] : null;
+                
+                return `<div class="exercise-card">
+                    ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
+                    <div class="ex-header">
+                        <span>${ex.name}</span>
+                        <span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span>
+                    </div>
+                    ${lastWorkout ? `
+                        <div class="last-workout-ref">
+                            <div class="last-workout-ref-header" onclick="toggleLastWorkoutRef(${ex.id})">
+                                <span>Last time ▼</span>
+                                <span style="color: var(--accent);">${lastWorkout.sets.length} sets</span>
+                            </div>
+                            <div class="last-workout-ref-content" id="last-workout-${ex.id}">
+                                ${lastWorkout.sets.map((s, i) => `Set ${i+1}: ${s.weight}kg × ${s.reps}`).join(' • ')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${ex.sets.map((s, i) => `<div class="set-row">Set ${i + 1}: ${s.weight}kg × ${s.reps}<span class="delete-btn" onclick="deleteSet(${ex.id},${i})">✕</span></div>`).join('')}
+                    <div class="input-row">
+                        <div class="weight-input-group">
+                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -5)">−5</button>
+                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -2.5)">−2.5</button>
+                            <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5">
+                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 2.5)">+2.5</button>
+                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 5)">+5</button>
+                        </div>
+                        <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1" style="max-width: 80px;">
+                        <button onclick="addSet(${ex.id})">✓</button>
+                    </div>
+                    <select class="feel-select" onchange="updateFeeling(${ex.id},this.value)">
+                        <option value="">How did it feel?</option>
+                        <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
+                        <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
+                        <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
+                    </select>
+                </div>`;
+            }).join('');
         }
         
         init();

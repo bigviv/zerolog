@@ -1,19 +1,16 @@
-const CACHE_NAME = 'zerolog-v2'; // Increment this when you update code
+const CACHE_NAME = 'zerolog-v2';
 const ASSETS = [
-  '/zerolog/',
-  '/zerolog/index.html',
-  '/zerolog/manifest.json',
-  '/zerolog/logo512.png'
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
-// Install: Cache the files
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// Activate: Clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -24,7 +21,6 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {

@@ -447,7 +447,128 @@
             }
             return null;
         }
+// NEW TOP 10 FEATURES - Add after loadData()
 
+let lastSetTime = {}, compactView = false, workoutStreak = 0;
+
+// Load compact view setting
+function loadData() {
+    try {
+        workouts = JSON.parse(localStorage.getItem('zerolog_data')) || [];
+        restDays = JSON.parse(localStorage.getItem('zerolog_rest_days')) || [];
+        dayLabels = JSON.parse(localStorage.getItem('zerolog_day_labels')) || {};
+        history = JSON.parse(localStorage.getItem('zerolog_history')) || [];
+        customExercises = JSON.parse(localStorage.getItem('zerolog_custom_exercises')) || [];
+        defaultTimer = parseInt(localStorage.getItem('zerolog_default_timer')) || 90;
+        autoStartTimer = JSON.parse(localStorage.getItem('zerolog_auto_start_timer')) || false;
+        compactView = JSON.parse(localStorage.getItem('zerolog_compact_view')) || false;
+        calculateStreak();
+    } catch (e) { console.error('Error loading data:', e); }
+}
+
+function calculateStreak() {
+    if (history.length === 0) { workoutStreak = 0; return; }
+    const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    let streak = 0, checkDate = new Date(today);
+    for (let i = 0; i < 365; i++) {
+        const hasWorkout = sortedHistory.some(w => {
+            const workoutDate = new Date(w.date);
+            workoutDate.setHours(0, 0, 0, 0);
+            return workoutDate.getTime() === checkDate.getTime();
+        });
+        if (hasWorkout) { streak++; checkDate.setDate(checkDate.getDate() - 1); }
+        else if (i === 0) { checkDate.setDate(checkDate.getDate() - 1); }
+        else { break; }
+    }
+    workoutStreak = streak;
+}
+
+let lastTap = 0;
+function handleWeightInputTap(exId) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 300 && tapLength > 0) {
+        const workout = workouts.find(w => w.id === exId);
+        if (workout && workout.sets.length > 0) {
+            const lastSet = workout.sets[workout.sets.length - 1];
+            document.getElementById(`w-${exId}`).value = lastSet.weight;
+            document.getElementById(`r-${exId}`).value = lastSet.reps;
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+    }
+    lastTap = currentTime;
+}
+
+let touchStartX = 0, touchEndX = 0;
+function handleSwipeStart(e, exId, setIndex) { touchStartX = e.touches[0].clientX; }
+function handleSwipeMove(e, exId, setIndex) {
+    touchEndX = e.touches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (diff > 50) {
+        const row = e.target.closest('.set-row');
+        if (row) row.classList.add('swiping');
+    }
+}
+function handleSwipeEnd(e, exId, setIndex) {
+    const diff = touchStartX - touchEndX;
+    const row = e.target.closest('.set-row');
+    if (diff > 100) { deleteSet(exId, setIndex); }
+    if (row) row.classList.remove('swiping');
+}
+
+function showPRCelebration(exerciseName, newWeight, oldWeight) {
+    const banner = document.createElement('div');
+    banner.className = 'pr-celebration';
+    banner.innerHTML = `
+        <div class="pr-title">🎉 NEW PR! 🎉</div>
+        <div class="pr-exercise">${exerciseName}</div>
+        <div class="pr-detail">${newWeight}kg</div>
+        <div class="pr-detail">Previous: ${oldWeight}kg (+${(newWeight - oldWeight).toFixed(1)}kg)</div>
+    `;
+    document.body.appendChild(banner);
+    confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors: ['#fbbf24', '#f59e0b', '#ffffff'] });
+    setTimeout(() => {
+        banner.style.animation = 'prPop 0.3s reverse';
+        setTimeout(() => banner.remove(), 300);
+    }, 3000);
+}
+
+function checkForPR(exName, weight) {
+    const exerciseHistory = history.flatMap(h => h.exercises.filter(e => e.name === exName));
+    if (exerciseHistory.length === 0) return false;
+    const previousMax = Math.max(...exerciseHistory.flatMap(e => e.sets.map(s => parseFloat(s.weight))));
+    if (parseFloat(weight) > previousMax) {
+        showPRCelebration(exName, parseFloat(weight), previousMax);
+        return true;
+    }
+    return false;
+}
+
+function getProgressIndicator(exName, weight, reps) {
+    const lastWorkout = getLastWorkoutForExercise(exName);
+    if (!lastWorkout || lastWorkout.sets.length === 0) return '';
+    const lastAvgWeight = lastWorkout.sets.reduce((sum, s) => sum + parseFloat(s.weight), 0) / lastWorkout.sets.length;
+    const currentWeight = parseFloat(weight);
+    if (currentWeight > lastAvgWeight) return '<span class="progress-indicator progress-up">↗️</span>';
+    else if (currentWeight < lastAvgWeight) return '<span class="progress-indicator progress-down">↘️</span>';
+    else return '<span class="progress-indicator progress-same">→</span>';
+}
+
+function getTimeSinceLastSet(exId) {
+    if (!lastSetTime[exId]) return '';
+    const now = Date.now();
+    const diff = Math.floor((now - lastSetTime[exId]) / 1000);
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')} since last set`;
+}
+
+function toggleCompactView() {
+    compactView = !compactView;
+    try { localStorage.setItem('zerolog_compact_view', JSON.stringify(compactView)); } catch(e) {}
+    render();
+}
         // NEW FEATURE 2: Toggle Last Workout Reference Display
         function toggleLastWorkoutRef(exId) {
             const content = document.getElementById(`last-workout-${exId}`);
@@ -587,38 +708,49 @@
         }
         
         function addSet(exId) {
-            const wInput = document.getElementById(`w-${exId}`);
-            const rInput = document.getElementById(`r-${exId}`);
-            const w = wInput.value.trim();
-            const r = rInput.value.trim();
-            wInput.classList.remove('input-error');
-            rInput.classList.remove('input-error');
-            if(!w || !r) {
-                if(!w) wInput.classList.add('input-error');
-                if(!r) rInput.classList.add('input-error');
-                return;
-            }
-            const weight = parseFloat(w);
-            const reps = parseInt(r);
-            if(isNaN(weight) || weight <= 0 || isNaN(reps) || reps <= 0) {
-                if(isNaN(weight) || weight <= 0) wInput.classList.add('input-error');
-                if(isNaN(reps) || reps <= 0) rInput.classList.add('input-error');
-                return;
-            }
-            workouts.find(w => w.id === exId).sets.push({weight: weight, reps: reps});
-            save();
-            showSuccessIndicator();
-            
-            // NEW FEATURE 4: Auto-start timer if enabled
-            if (autoStartTimer) {
-                startTimer(defaultTimer);
-            }
-            
-            wInput.value = weight;
-            rInput.value = reps;
-            wInput.focus();
-        }
-        
+    const wInput = document.getElementById(`w-${exId}`);
+    const rInput = document.getElementById(`r-${exId}`);
+    const w = wInput.value.trim(); const r = rInput.value.trim();
+    wInput.classList.remove('input-error'); rInput.classList.remove('input-error');
+    if(!w || !r) {
+        if(!w) wInput.classList.add('input-error');
+        if(!r) rInput.classList.add('input-error');
+        return;
+    }
+    const weight = parseFloat(w); const reps = parseInt(r);
+    if(isNaN(weight) || weight <= 0 || isNaN(reps) || reps <= 0) {
+        if(isNaN(weight) || weight <= 0) wInput.classList.add('input-error');
+        if(isNaN(reps) || reps <= 0) rInput.classList.add('input-error');
+        return;
+    }
+    
+    const workout = workouts.find(w => w.id === exId);
+    const setType = document.querySelector(`input[name="type-${exId}"]:checked`)?.value || 'working';
+    const note = document.getElementById(`note-${exId}`)?.value || '';
+    
+    workout.sets.push({weight: weight, reps: reps, type: setType, note: note});
+    checkForPR(workout.name, weight);
+    lastSetTime[exId] = Date.now();
+    
+    save(); showSuccessIndicator();
+    if (autoStartTimer) startTimer(defaultTimer);
+    wInput.value = weight; rInput.value = reps;
+    if (note) document.getElementById(`note-${exId}`).value = '';
+    wInput.focus();
+}
+        function completeWorkout() {
+    const dailyEx = workouts.filter(ex => ex.day === currentDay);
+    const completedExercises = dailyEx.filter(ex => ex.sets.length > 0);
+    if(completedExercises.length === 0) { alert('Add some sets before completing your workout!'); return; }
+    stopWorkoutTimer();
+    confetti({ particleCount: 150, spread: 70, origin: {y: 0.6}, colors: ['#2563eb', '#ffffff'] });
+    history.push({ date: new Date().toISOString(), label: dayLabels[currentDay] || currentDay, exercises: completedExercises });
+    try { localStorage.setItem('zerolog_history', JSON.stringify(history)); } catch(e) { alert('Warning: Could not save workout history.'); }
+    const completedIds = completedExercises.map(ex => ex.id);
+    workouts = workouts.map(ex => { if(completedIds.includes(ex.id)) { return {...ex, sets: [], feeling: ''}; } return ex; });
+    calculateStreak(); // NEW
+    save(); alert('Workout logged!');
+}
         function deleteSet(exId, index) {
             const workout = workouts.find(w => w.id === exId);
             const deletedSet = workout.sets[index];
@@ -1370,52 +1502,114 @@
                 a.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💪</div><h3>Ready to train?</h3><p>Add an exercise above or select from quick options to get started.</p></div>`;
                 return;
             }
-            const aiInsights = renderAIInsights();
-            a.innerHTML = aiInsights || '';
-            
-            // NEW: Enhanced exercise card rendering with all 5 features
-            a.innerHTML += dailyEx.map(ex => {
-                const lastWorkout = getLastWorkoutForExercise(ex.name);
-                const volume = calculateExerciseVolume(ex.sets);
-                const lastSet = ex.sets.length > 0 ? ex.sets[ex.sets.length - 1] : null;
-                
-                return `<div class="exercise-card">
-                    ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
-                    <div class="ex-header">
-                        <span>${ex.name}</span>
-                        <span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span>
-                    </div>
-                    ${lastWorkout ? `
-                        <div class="last-workout-ref">
-                            <div class="last-workout-ref-header" onclick="toggleLastWorkoutRef(${ex.id})">
-                                <span>Last time ▼</span>
-                                <span style="color: var(--accent);">${lastWorkout.sets.length} sets</span>
-                            </div>
-                            <div class="last-workout-ref-content" id="last-workout-${ex.id}">
-                                ${lastWorkout.sets.map((s, i) => `Set ${i+1}: ${s.weight}kg × ${s.reps}`).join(' • ')}
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${ex.sets.map((s, i) => `<div class="set-row">Set ${i + 1}: ${s.weight}kg × ${s.reps}<span class="delete-btn" onclick="deleteSet(${ex.id},${i})">✕</span></div>`).join('')}
-                    <div class="input-row">
-                        <div class="weight-input-group">
-                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -5)">−5</button>
-                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -2.5)">−2.5</button>
-                            <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5">
-                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 2.5)">+2.5</button>
-                            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 5)">+5</button>
-                        </div>
-                        <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1" style="max-width: 80px;">
-                        <button onclick="addSet(${ex.id})">✓</button>
-                    </div>
-                    <select class="feel-select" onchange="updateFeeling(${ex.id},this.value)">
-                        <option value="">How did it feel?</option>
-                        <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
-                        <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
-                        <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
-                    </select>
-                </div>`;
-            }).join('');
+            // Inside render(), after checking for rest day and empty state:
+
+const aiInsights = renderAIInsights();
+a.innerHTML = aiInsights || '';
+
+// NEW: Show workout streak
+if (workoutStreak > 0) {
+    a.innerHTML += `<div class="streak-banner">
+        <div class="streak-icon">🔥</div>
+        <div class="streak-text">
+            <div class="streak-count">${workoutStreak} Day Streak!</div>
+            <div style="font-size:12px;opacity:0.9;">Keep it going!</div>
+        </div>
+    </div>`;
+}
+
+// NEW: Compact view toggle
+if (dailyEx.length > 0) {
+    a.innerHTML += `<div class="view-toggle">
+        <button class="view-btn ${!compactView ? 'active' : ''}" onclick="if(compactView) toggleCompactView()">Normal View</button>
+        <button class="view-btn ${compactView ? 'active' : ''}" onclick="if(!compactView) toggleCompactView()">Compact View</button>
+    </div>`;
+}
+
+a.innerHTML += dailyEx.map(ex => {
+    const lastWorkout = getLastWorkoutForExercise(ex.name);
+    const volume = calculateExerciseVolume(ex.sets);
+    const lastSet = ex.sets.length > 0 ? ex.sets[ex.sets.length - 1] : null;
+    const timeSince = getTimeSinceLastSet(ex.id);
+    
+    // Compact view
+    if (compactView && ex.sets.length > 0) {
+        const weights = [...new Set(ex.sets.map(s => s.weight))];
+        const setsDisplay = weights.map(w => {
+            const repsForWeight = ex.sets.filter(s => s.weight == w).map(s => s.reps).join(',');
+            return `${w}kg: ${repsForWeight}`;
+        }).join(' • ');
+        
+        return `<div class="exercise-card">
+            ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
+            <div class="ex-header"><span>${ex.name}</span><span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span></div>
+            <div class="compact-sets">${setsDisplay}</div>
+            <div class="input-row" style="margin-top:10px;">
+                <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5" ontouchstart="handleWeightInputTap(${ex.id})">
+                <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1">
+                <button onclick="addSet(${ex.id})">✓</button>
+            </div>
+        </div>`;
+    }
+    
+    // Normal view with ALL features
+    return `<div class="exercise-card">
+        ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
+        <div class="ex-header"><span>${ex.name}</span><span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span></div>
+        ${lastWorkout ? `<div class="last-workout-ref"><div class="last-workout-ref-header" onclick="toggleLastWorkoutRef(${ex.id})"><span>Last time ▼</span><span style="color: var(--accent);">${lastWorkout.sets.length} sets</span></div><div class="last-workout-ref-content" id="last-workout-${ex.id}">${lastWorkout.sets.map((s, i) => `Set ${i+1}: ${s.weight}kg × ${s.reps}`).join(' • ')}</div></div>` : ''}
+        ${ex.sets.map((s, i) => {
+            const progress = i === ex.sets.length - 1 && lastWorkout ? getProgressIndicator(ex.name, s.weight, s.reps) : '';
+            const typeB = s.type === 'warmup' ? '<span class="set-type-badge warmup-badge">W</span>' : '';
+            const noteD = s.note ? `<span class="set-note">💬 ${s.note}</span>` : '';
+            return `<div class="set-row" ontouchstart="handleSwipeStart(event, ${ex.id}, ${i})" ontouchmove="handleSwipeMove(event, ${ex.id}, ${i})" ontouchend="handleSwipeEnd(event, ${ex.id}, ${i})">
+                <span>Set ${i + 1}: ${s.weight}kg × ${s.reps}${typeB}${progress}${noteD}</span>
+                <span class="delete-btn" onclick="deleteSet(${ex.id},${i})">✕</span>
+                <div class="set-delete-reveal">DELETE</div>
+            </div>`;
+        }).join('')}
+        ${timeSince ? `<div class="time-since">⏱️ ${timeSince}</div>` : ''}
+        <div class="weight-controls">
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -5)">−5</button>
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -2.5)">−2.5</button>
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 2.5)">+2.5</button>
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 5)">+5</button>
+        </div>
+        <div class="input-row">
+            <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5" ontouchstart="handleWeightInputTap(${ex.id})">
+            <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1">
+            <button onclick="addSet(${ex.id})">✓</button>
+        </div>
+        <div class="set-type-selector">
+            <label class="type-btn active">
+                <input type="radio" name="type-${ex.id}" value="working" checked style="display:none">
+                💪 Working
+            </label>
+            <label class="type-btn">
+                <input type="radio" name="type-${exid}" value="warmup" style="display:none">
+                🔥 Warmup
+            </label>
+        </div>
+        <input type="text" id="note-${ex.id}" class="note-input" placeholder="💬 Quick note (optional)...">
+        <select class="feel-select" onchange="updateFeeling(${ex.id},this.value)">
+            <option value="">How did it feel?</option>
+            <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
+            <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
+            <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
+        </select>
+    </div>`;
+}).join('');
+
+// Add click handlers for type selector
+setTimeout(() => {
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.onclick = function() {
+            const parent = this.closest('.set-type-selector');
+            parent.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            this.querySelector('input').checked = true;
+        };
+    });
+}, 100);
         }
         
         init();

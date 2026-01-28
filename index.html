@@ -20,631 +20,710 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 
-    <style>
-        :root { 
-            --bg: #000; 
-            --card: #0a0a0a; 
-            --accent: #2563eb; 
-            --success: #16a34a; 
-            --text: #fff; 
-            --dim: #888; 
-            --danger: #b91c1c; 
-            --warning: #f59e0b; 
-        }
-        
-        [data-theme="light"] {
-            --bg: #ffffff;
-            --card: #f5f5f5;
-            --accent: #2563eb;
-            --success: #16a34a;
-            --text: #000;
-            --dim: #666;
-            --danger: #dc2626;
-            --warning: #f59e0b;
-        }
-        
-        * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 20px; transition: background 0.3s, color 0.3s; }
-        h1 { font-style: italic; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; }
+Here's the complete sections to drop in. Replace these entirely:
+1. STYLE SECTION - Replace the entire <style> section:
+<style>
+    :root { 
+        --bg: #000; 
+        --card: #0a0a0a; 
+        --accent: #2563eb; 
+        --success: #16a34a; 
+        --text: #fff; 
+        --dim: #888; 
+        --danger: #b91c1c; 
+        --warning: #f59e0b; 
+    }
+    
+    [data-theme="light"] {
+        --bg: #ffffff;
+        --card: #f5f5f5;
+        --accent: #2563eb;
+        --success: #16a34a;
+        --text: #000;
+        --dim: #666;
+        --danger: #dc2626;
+        --warning: #f59e0b;
+    }
+    
+    * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 100px; transition: background 0.3s, color 0.3s; }
+    h1 { font-style: italic; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; }
 
-        .workout-timer { 
-            position: fixed; 
-            top: 10px; 
-            right: 10px; 
-            background: rgba(37, 99, 235, 0.2); 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            color: var(--accent); 
-            border: 1px solid var(--accent);
-            z-index: 100;
-            display: none;
-        }
-        .workout-timer.active { display: block; }
+    .workout-timer { 
+        position: fixed; 
+        top: 10px; 
+        right: 10px; 
+        background: rgba(37, 99, 235, 0.2); 
+        padding: 8px 16px; 
+        border-radius: 20px; 
+        font-size: 14px; 
+        font-weight: bold; 
+        color: var(--accent); 
+        border: 1px solid var(--accent);
+        z-index: 100;
+        display: none;
+    }
+    .workout-timer.active { display: block; }
 
-        /* Quick Timer Presets */
-        .quick-timer-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid #222;
-            padding: 10px;
-            display: none;
-            gap: 8px;
-            z-index: 99;
-            overflow-x: auto;
-        }
-        .quick-timer-bar.active { display: flex; }
-        .quick-timer-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 14px;
-        }
+    /* Quick Timer Bar */
+    .quick-timer-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--card);
+        border-top: 1px solid #222;
+        padding: 10px;
+        display: none;
+        gap: 8px;
+        z-index: 99;
+        overflow-x: auto;
+    }
+    .quick-timer-bar.active { display: flex; }
+    .quick-timer-btn {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        white-space: nowrap;
+        font-size: 14px;
+    }
 
-        /* Workout Stats Dashboard */
-        .workout-stats-quick {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .stat-quick {
-            background: var(--card);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #222;
-        }
-        .stat-quick-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--accent);
-        }
-        .stat-quick-label {
-            font-size: 10px;
-            color: var(--dim);
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
+    /* Workout Stats Dashboard */
+    .workout-stats-quick {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .stat-quick {
+        background: var(--card);
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #222;
+    }
+    .stat-quick-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--accent);
+    }
+    .stat-quick-label {
+        font-size: 10px;
+        color: var(--dim);
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
 
-        /* Drag Handle */
-        .drag-handle {
-            cursor: grab;
-            padding: 10px;
-            color: var(--dim);
-            font-size: 18px;
-            user-select: none;
-        }
-        .drag-handle:active { cursor: grabbing; }
-        .exercise-card.dragging { opacity: 0.5; }
+    /* Drag Handle */
+    .drag-handle {
+        cursor: grab;
+        padding: 10px;
+        color: var(--dim);
+        font-size: 18px;
+        user-select: none;
+    }
+    .drag-handle:active { cursor: grabbing; }
+    .exercise-card.dragging { opacity: 0.5; }
 
-        /* Superset Badge */
-        .superset-badge {
-            background: var(--warning);
-            color: #000;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
+    /* Superset Badge */
+    .superset-badge {
+        background: var(--warning);
+        color: #000;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        margin-left: 8px;
+    }
 
-        /* Volume Target Progress */
-        .volume-target {
-            margin-top: 10px;
-            font-size: 11px;
-            color: var(--dim);
-        }
-        .volume-progress-bar {
-            height: 4px;
-            background: #222;
-            border-radius: 2px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        .volume-progress-fill {
-            height: 100%;
-            background: var(--success);
-            transition: width 0.3s;
-        }
+    /* Volume Target Progress */
+    .volume-target {
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--dim);
+    }
+    .volume-progress-bar {
+        height: 4px;
+        background: #222;
+        border-radius: 2px;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+    .volume-progress-fill {
+        height: 100%;
+        background: var(--success);
+        transition: width 0.3s;
+    }
 
-        /* Template Buttons */
-        .template-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-        }
-        .template-btn {
-            background: #222;
-            border: 1px solid #333;
-            color: var(--text);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-        .template-btn.active { background: var(--accent); color: white; }
+    /* Template Buttons */
+    .template-bar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        overflow-x: auto;
+    }
+    .template-btn {
+        background: #222;
+        border: 1px solid #333;
+        color: var(--text);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+    .template-btn.active { background: var(--accent); color: white; }
 
-        /* Workout Notes */
-        .workout-notes-section {
-            background: var(--card);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #222;
-        }
-        .workout-notes-section textarea {
-            width: 100%;
-            background: #111;
-            border: 1px solid #222;
-            color: var(--text);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: vertical;
-            min-height: 60px;
-        }
+    /* Workout Notes */
+    .workout-notes-section {
+        background: var(--card);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #222;
+    }
+    .workout-notes-section textarea {
+        width: 100%;
+        background: #111;
+        border: 1px solid #222;
+        color: var(--text);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 60px;
+    }
 
-        /* Set Type Extended */
-        .set-type-badge {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-        .warmup-badge { background: #f59e0b; color: #000; }
-        .cluster-badge { background: #8b5cf6; color: #fff; }
-        .drop-badge { background: #ec4899; color: #fff; }
-        .amrap-badge { background: #10b981; color: #fff; }
+    /* Set Type Extended */
+    .set-type-badge {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 9px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    .warmup-badge { background: #f59e0b; color: #000; }
+    .cluster-badge { background: #8b5cf6; color: #fff; }
+    .drop-badge { background: #ec4899; color: #fff; }
+    .amrap-badge { background: #10b981; color: #fff; }
 
-        /* Theme Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: var(--card);
-            border: 1px solid #222;
-            color: var(--text);
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            z-index: 100;
-            font-size: 18px;
-        }
+    /* Theme Toggle */
+    .theme-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: var(--card);
+        border: 1px solid #222;
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        z-index: 100;
+        font-size: 18px;
+    }
 
-        /* Exercise History Modal */
-        .history-chart-container {
-            margin-top: 20px;
-            padding: 15px;
-            background: var(--card);
-            border-radius: 8px;
-        }
+    /* Exercise History Modal */
+    .history-chart-container {
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--card);
+        border-radius: 8px;
+    }
 
-        /* Warmup Calculator */
-        .warmup-calculator {
-            background: #111;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-        }
-        .warmup-set {
-            padding: 6px 0;
-            color: var(--dim);
-        }
+    /* Warmup Calculator */
+    .warmup-calculator {
+        background: #111;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+    }
+    .warmup-set {
+        padding: 6px 0;
+        color: var(--dim);
+    }
 
-        /* Body Weight Tracker */
-        .bodyweight-input {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .bodyweight-input input {
-            flex: 1;
-            background: #111;
-            border: 1px solid #222;
-            color: var(--text);
-            padding: 12px;
-            border-radius: 8px;
-        }
+    /* Body Weight Tracker */
+    .bodyweight-input {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .bodyweight-input input {
+        flex: 1;
+        background: #111;
+        border: 1px solid #222;
+        color: var(--text);
+        padding: 12px;
+        border-radius: 8px;
+    }
 
-        /* Comparison View */
-        .comparison-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .comparison-side {
-            background: var(--card);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #222;
-        }
-        .comparison-header {
-            font-weight: bold;
-            color: var(--accent);
-            margin-bottom: 10px;
-            font-size: 12px;
-        }
+    /* Comparison View */
+    .comparison-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    .comparison-side {
+        background: var(--card);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #222;
+    }
+    .comparison-header {
+        font-weight: bold;
+        color: var(--accent);
+        margin-bottom: 10px;
+        font-size: 12px;
+    }
 
-        /* Plate Visual */
-        .plate-visual {
-            margin-top: 15px;
-            padding: 20px;
-            background: #111;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            overflow-x: auto;
-        }
-        .plate {
-            border: 2px solid;
-            border-radius: 4px;
-            padding: 8px 4px;
-            font-size: 10px;
-            font-weight: bold;
-            text-align: center;
-            min-width: 30px;
-        }
-        .plate-25 { border-color: #ef4444; color: #ef4444; height: 80px; }
-        .plate-20 { border-color: #3b82f6; color: #3b82f6; height: 70px; }
-        .plate-15 { border-color: #eab308; color: #eab308; height: 60px; }
-        .plate-10 { border-color: #22c55e; color: #22c55e; height: 50px; }
-        .plate-5 { border-color: #fff; color: #fff; height: 40px; }
-        .plate-2-5 { border-color: #888; color: #888; height: 30px; }
+    /* Plate Visual */
+    .plate-visual {
+        margin-top: 15px;
+        padding: 20px;
+        background: #111;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        overflow-x: auto;
+    }
+    .plate {
+        border: 2px solid;
+        border-radius: 4px;
+        padding: 8px 4px;
+        font-size: 10px;
+        font-weight: bold;
+        text-align: center;
+        min-width: 30px;
+    }
+    .plate-25 { border-color: #ef4444; color: #ef4444; height: 80px; }
+    .plate-20 { border-color: #3b82f6; color: #3b82f6; height: 70px; }
+    .plate-15 { border-color: #eab308; color: #eab308; height: 60px; }
+    .plate-10 { border-color: #22c55e; color: #22c55e; height: 50px; }
+    .plate-5 { border-color: #fff; color: #fff; height: 40px; }
+    .plate-2-5 { border-color: #888; color: #888; height: 30px; }
 
-        /* Weekly Volume Chart */
-        .volume-chart {
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--card);
-            border-radius: 12px;
-            border: 1px solid #222;
-        }
+    /* Weekly Volume Chart */
+    .volume-chart {
+        margin-top: 20px;
+        padding: 20px;
+        background: var(--card);
+        border-radius: 12px;
+        border: 1px solid #222;
+    }
 
-        .tabs { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #222; }
-        .tab { padding: 12px 0; color: var(--dim); cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: bold; flex: 1; text-align: center; }
-        .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-        .day-picker { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
-        .day { padding: 8px 16px; border-radius: 20px; background: var(--card); font-size: 12px; cursor: pointer; color: var(--dim); white-space: nowrap; }
-        .day.active { background: var(--accent); color: white; }
-        .day-title-container input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #222; color: var(--accent); font-size: 18px; font-weight: bold; padding: 10px 0; outline: none; margin-bottom: 15px; }
-        .add-ex-container { background: #111; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; gap: 10px; border: 1px solid #222; }
-        .add-ex-container input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 14px; }
-        .quick-select { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
-        .q-btn { background: #222; color: #fff; border: 1px solid #333; padding: 6px 14px; border-radius: 6px; font-size: 11px; white-space: nowrap; cursor: pointer; }
-        .exercise-card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; position: relative; }
+    .tabs { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #222; overflow-x: auto; }
+    .tab { padding: 12px 8px; color: var(--dim); cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: bold; flex: 1; text-align: center; white-space: nowrap; min-width: 80px; }
+    .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+    .day-picker { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+    .day { padding: 8px 16px; border-radius: 20px; background: var(--card); font-size: 12px; cursor: pointer; color: var(--dim); white-space: nowrap; }
+    .day.active { background: var(--accent); color: white; }
+    .day-title-container input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #222; color: var(--accent); font-size: 18px; font-weight: bold; padding: 10px 0; outline: none; margin-bottom: 15px; }
+    .add-ex-container { background: #111; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; gap: 10px; border: 1px solid #222; }
+    .add-ex-container input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 14px; }
+    .quick-select { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
+    .q-btn { background: #222; color: #fff; border: 1px solid #333; padding: 6px 14px; border-radius: 6px; font-size: 11px; white-space: nowrap; cursor: pointer; }
+    
+    /* IMPROVED Exercise Card */
+    .exercise-card { 
+        background: var(--card); 
+        border-radius: 12px; 
+        padding: 15px; 
+        margin-bottom: 15px; 
+        border: 1px solid #1a1a1a; 
+        position: relative; 
+    }
 
-        .ex-volume { 
-            position: absolute; 
-            top: 15px; 
-            right: 15px; 
-            color: var(--success); 
-            font-size: 11px; 
-            font-weight: bold;
-            background: rgba(22, 163, 74, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
+    .ex-volume { 
+        position: absolute; 
+        top: 15px; 
+        right: 15px; 
+        color: var(--success); 
+        font-size: 11px; 
+        font-weight: bold;
+        background: rgba(22, 163, 74, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
 
-        .last-workout-ref {
-            background: #0a0a0a;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            color: var(--dim);
-        }
-        .last-workout-ref-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-        }
-        .last-workout-ref-content {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #222;
-            display: none;
-        }
-        .last-workout-ref-content.expanded {
-            display: block;
-        }
+    .last-workout-ref {
+        background: #0a0a0a;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 12px;
+        color: var(--dim);
+    }
+    .last-workout-ref-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+    }
+    .last-workout-ref-content {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #222;
+        display: none;
+    }
+    .last-workout-ref-content.expanded {
+        display: block;
+    }
 
-        .ex-header { display: flex; justify-content: space-between; align-items: center; color: var(--accent); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
-        .ex-header-left { display: flex; align-items: center; flex: 1; cursor: pointer; }
-        .set-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px; background: #111; border-radius: 6px; font-size: 14px; position: relative; }
-        .delete-btn { color: #ff4444; cursor: pointer; font-weight: bold; }
-        .input-row { display: flex; gap: 10px; margin-top: 15px; }
+    .ex-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        color: var(--accent); 
+        font-size: 12px; 
+        font-weight: bold; 
+        text-transform: uppercase; 
+        margin-bottom: 15px; 
+    }
+    .ex-header-left { 
+        display: flex; 
+        align-items: center; 
+        flex: 1; 
+        cursor: pointer; 
+    }
+    
+    .set-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 8px; 
+        padding: 10px; 
+        background: #111; 
+        border-radius: 6px; 
+        font-size: 13px; 
+        position: relative; 
+    }
+    .delete-btn { color: #ff4444; cursor: pointer; font-weight: bold; font-size: 18px; }
+    
+    /* IMPROVED Input Row */
+    .input-row { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr auto; 
+        gap: 10px; 
+        margin-top: 15px; 
+    }
+    .input-row input { 
+        background: #111; 
+        border: 1px solid #222; 
+        color: white; 
+        padding: 16px 12px; 
+        border-radius: 8px; 
+        text-align: center; 
+        font-size: 16px; 
+        font-weight: bold;
+    }
+    .input-row input:focus { border-color: var(--accent); outline: none; }
+    .input-row input.input-error { border-color: var(--danger); }
+    .input-row button {
+        padding: 16px 24px;
+        font-size: 18px;
+        border-radius: 8px;
+    }
 
-        .weight-input-group {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex: 1;
-        }
-        .weight-adjust-btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: var(--accent);
-            padding: 14px 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            min-width: 45px;
-        }
-        .weight-adjust-btn:active {
-            background: #222;
-        }
+    /* IMPROVED Compact Weight Controls */
+    .weight-controls {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-top: 10px;
+    }
+    .weight-adjust-btn {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        color: var(--accent);
+        padding: 8px 6px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 11px;
+        min-width: auto;
+    }
+    .weight-adjust-btn:active {
+        background: #222;
+    }
 
-        .weight-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
+    /* IMPROVED Compact Set Type Selector */
+    .set-type-selector {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    .type-btn {
+        background: #111;
+        border: 1px solid #222;
+        color: var(--dim);
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        user-select: none;
+    }
+    .type-btn.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+    }
 
-        .input-row input { background: #111; border: 1px solid #222; color: white; padding: 14px; border-radius: 8px; width: 100%; text-align: center; font-size: 16px; }
-        .input-row input:focus { border-color: var(--accent); outline: none; }
-        .input-row input.input-error { border-color: var(--danger); }
-        
-        .set-type-selector {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .type-btn {
-            background: #111;
-            border: 1px solid #222;
-            color: var(--dim);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .type-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
+    .note-input {
+        width: 100%;
+        background: #111;
+        border: 1px solid #222;
+        color: var(--text);
+        padding: 8px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 12px;
+    }
+    
+    .feel-select { 
+        width: 100%; 
+        background: #111; 
+        border: 1px solid #222; 
+        color: var(--dim); 
+        padding: 10px; 
+        border-radius: 8px; 
+        margin-top: 10px; 
+        font-size: 12px; 
+    }
+    
+    .recovery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .recovery-tip { background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; font-size: 12px; text-align: left; }
+    .recovery-tip strong { display: block; color: var(--accent); margin-bottom: 5px; }
+    
+    /* Timer Banner */
+    #timer-banner { 
+        position: fixed; 
+        bottom: 10px; 
+        left: 10px; 
+        right: 10px; 
+        background: var(--accent); 
+        color: white; 
+        padding: 15px; 
+        display: none; 
+        flex-direction: column; 
+        gap: 15px; 
+        z-index: 1001; 
+        border-radius: 12px; 
+        transition: background 0.3s;
+    }
+    .timer-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .timer-ad { background: #fff; border-radius: 8px; padding: 5px; text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+    
+    button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-full { width: 100%; padding: 18px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; margin-bottom: 20px; }
+    .btn-success { background: var(--success); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--dim); }
+    .empty-state-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
+    .empty-state h3 { color: var(--text); margin-bottom: 10px; }
+    .success-indicator { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; z-index: 2000; display: none; font-weight: bold; }
+    .history-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
+    .history-date { color: var(--accent); font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+    .history-exercise { padding: 8px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
+    .history-exercise:last-child { border-bottom: none; }
+    .history-exercise-name { color: var(--text); font-weight: bold; margin-bottom: 5px; }
+    .history-sets { color: var(--dim); font-size: 12px; }
+    .pr-badge { background: #fbbf24; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 5px; }
+    .stat-card { background: #111; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+    .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
+    .stat-label { font-size: 11px; color: var(--dim); text-transform: uppercase; margin-top: 5px; }
+    .plate-breakdown { background: #111; padding: 15px; border-radius: 8px; margin-top: 15px; }
+    .plate-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; color: var(--dim); font-size: 13px; }
+    .plate-item:last-child { border-bottom: none; }
+    .calc-input-group { margin-bottom: 15px; }
+    .calc-input-group label { display: block; color: var(--dim); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; }
+    .calc-input-group select, .calc-input-group input { width: 100%; background: #111; border: 1px solid #222; color: white; padding: 15px; border-radius: 8px; font-size: 16px; }
 
-        .note-input {
-            width: 100%;
-            background: #111;
-            border: 1px solid #222;
-            color: var(--text);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-        }
-        
-        .feel-select { width: 100%; background: #111; border: 1px solid #222; color: var(--dim); padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 12px; }
-        .recovery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .recovery-tip { background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; font-size: 12px; text-align: left; }
-        .recovery-tip strong { display: block; color: var(--accent); margin-bottom: 5px; }
-        #timer-banner { position: fixed; bottom: 10px; left: 10px; right: 10px; background: var(--accent); color: white; padding: 15px; display: none; flex-direction: column; gap: 15px; z-index: 1001; border-radius: 12px; }
-        .timer-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .timer-ad { background: #fff; border-radius: 8px; padding: 5px; text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; }
-        button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-full { width: 100%; padding: 18px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; margin-bottom: 200px; }
-        .btn-success { background: var(--success); }
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--dim); }
-        .empty-state-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
-        .empty-state h3 { color: var(--text); margin-bottom: 10px; }
-        .success-indicator { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 24px; border-radius: 8px; z-index: 2000; display: none; font-weight: bold; }
-        .history-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; }
-        .history-date { color: var(--accent); font-weight: bold; margin-bottom: 10px; font-size: 14px; }
-        .history-exercise { padding: 8px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
-        .history-exercise:last-child { border-bottom: none; }
-        .history-exercise-name { color: var(--text); font-weight: bold; margin-bottom: 5px; }
-        .history-sets { color: var(--dim); font-size: 12px; }
-        .pr-badge { background: #fbbf24; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 5px; }
-        .stat-card { background: #111; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
-        .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
-        .stat-label { font-size: 11px; color: var(--dim); text-transform: uppercase; margin-top: 5px; }
-        .plate-breakdown { background: #111; padding: 15px; border-radius: 8px; margin-top: 15px; }
-        .plate-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; color: var(--dim); font-size: 13px; }
-        .plate-item:last-child { border-bottom: none; }
-        .calc-input-group { margin-bottom: 15px; }
-        .calc-input-group label { display: block; color: var(--dim); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; }
-        .calc-input-group select, .calc-input-group input { width: 100%; background: #111; border: 1px solid #222; color: white; padding: 15px; border-radius: 8px; font-size: 16px; }
+    .settings-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        background: #111;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        cursor: pointer;
+    }
+    .settings-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .settings-checkbox label {
+        flex: 1;
+        cursor: pointer;
+        font-size: 14px;
+    }
 
-        .settings-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px;
-            background: #111;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            cursor: pointer;
-        }
-        .settings-checkbox input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        .settings-checkbox label {
-            flex: 1;
-            cursor: pointer;
-            font-size: 14px;
-        }
+    .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+    .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
+    .file-input-label { display: block; width: 100%; padding: 18px; background: #222; border: 1px solid #333; color: white; text-align: center; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 15px; }
+    .repeat-workout-btn { background: #16a34a; margin-bottom: 15px; }
+    .ai-insights { background: #111; border: 1px solid #2563eb; }
+    .insight-box { padding: 12px; background: var(--card); border-radius: 8px; margin-bottom: 10px; }
+    .insight-box-header { font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+    .insight-box-content { font-size: 13px; color: var(--dim); line-height: 1.5; }
+    .insight-suggestion { background: rgba(37, 99, 235, 0.1); padding: 8px 12px; border-radius: 6px; margin-top: 8px; font-size: 12px; border-left: 3px solid var(--accent); }
+    .undo-banner { position: fixed; bottom: 90px; left: 10px; right: 10px; background: #333; color: white; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 1000; border-radius: 12px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+    .search-box { width: 100%; background: #111; border: 1px solid #222; color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+    .search-box:focus { border-color: var(--accent); outline: none; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; overflow-y: auto; }
+    .modal-content { background: var(--bg); margin: 20px; padding: 20px; border-radius: 12px; max-width: 600px; margin: 20px auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-close { color: var(--dim); cursor: pointer; font-size: 24px; }
+    .filter-group { margin-bottom: 15px; }
+    .exercise-grid { display: grid; gap: 12px; margin-top: 20px; }
+    .exercise-item { background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid #222; cursor: pointer; }
+    .exercise-item:hover { border-color: var(--accent); }
+    .exercise-name { color: var(--text); font-weight: bold; margin-bottom: 5px; }
+    .exercise-meta { color: var(--dim); font-size: 11px; }
+    
+    .keyboard-hint {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: var(--card);
+        border: 1px solid #222;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        color: var(--dim);
+        z-index: 99;
+    }
 
-        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
-        .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
-        .file-input-label { display: block; width: 100%; padding: 18px; background: #222; border: 1px solid #333; color: white; text-align: center; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 15px; }
-        .repeat-workout-btn { background: #16a34a; margin-bottom: 15px; }
-        .ai-insights { background: #111; border: 1px solid #2563eb; }
-        .insight-box { padding: 12px; background: var(--card); border-radius: 8px; margin-bottom: 10px; }
-        .insight-box-header { font-weight: bold; margin-bottom: 5px; font-size: 13px; }
-        .insight-box-content { font-size: 13px; color: var(--dim); line-height: 1.5; }
-        .insight-suggestion { background: rgba(37, 99, 235, 0.1); padding: 8px 12px; border-radius: 6px; margin-top: 8px; font-size: 12px; border-left: 3px solid var(--accent); }
-        .undo-banner { position: fixed; bottom: 90px; left: 10px; right: 10px; background: #333; color: white; padding: 15px; display: none; justify-content: space-between; align-items: center; z-index: 1000; border-radius: 12px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .search-box { width: 100%; background: #111; border: 1px solid #222; color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
-        .search-box:focus { border-color: var(--accent); outline: none; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; overflow-y: auto; }
-        .modal-content { background: var(--bg); margin: 20px; padding: 20px; border-radius: 12px; max-width: 600px; margin: 20px auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-close { color: var(--dim); cursor: pointer; font-size: 24px; }
-        .filter-group { margin-bottom: 15px; }
-        .exercise-grid { display: grid; gap: 12px; margin-top: 20px; }
-        .exercise-item { background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid #222; cursor: pointer; }
-        .exercise-item:hover { border-color: var(--accent); }
-        .exercise-name { color: var(--text); font-weight: bold; margin-bottom: 5px; }
-        .exercise-meta { color: var(--dim); font-size: 11px; }
-        
-        .keyboard-hint {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: var(--card);
-            border: 1px solid #222;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            color: var(--dim);
-            z-index: 99;
-        }
+    .compact-sets {
+        color: var(--dim);
+        font-size: 13px;
+        padding: 10px;
+        background: #111;
+        border-radius: 6px;
+    }
 
-        .compact-sets {
-            color: var(--dim);
-            font-size: 13px;
-            padding: 10px;
-            background: #111;
-            border-radius: 6px;
-        }
+    .view-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    .view-btn {
+        flex: 1;
+        background: #111;
+        border: 1px solid #222;
+        color: var(--dim);
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .view-btn.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+    }
 
-        .view-toggle {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        .view-btn {
-            flex: 1;
-            background: #111;
-            border: 1px solid #222;
-            color: var(--dim);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .view-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
+    .streak-banner {
+        background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .streak-icon {
+        font-size: 32px;
+    }
+    .streak-count {
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+    }
 
-        .streak-banner {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .streak-icon {
-            font-size: 32px;
-        }
-        .streak-count {
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-        }
+    .progress-indicator {
+        margin-left: 8px;
+        font-size: 14px;
+    }
+    .progress-up { color: #22c55e; }
+    .progress-down { color: #ef4444; }
+    .progress-same { color: #888; }
 
-        .progress-indicator {
-            margin-left: 8px;
-            font-size: 14px;
-        }
-        .progress-up { color: #22c55e; }
-        .progress-down { color: #ef4444; }
-        .progress-same { color: #888; }
+    .time-since {
+        font-size: 11px;
+        color: var(--dim);
+        margin-top: 8px;
+        text-align: center;
+    }
 
-        .time-since {
-            font-size: 11px;
-            color: var(--dim);
-            margin-top: 8px;
-            text-align: center;
-        }
+    .set-delete-reveal {
+        position: absolute;
+        right: -100px;
+        top: 0;
+        bottom: 0;
+        background: var(--danger);
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        font-weight: bold;
+        transition: right 0.2s;
+    }
+    .set-row.swiping .set-delete-reveal {
+        right: 0;
+    }
 
-        .set-delete-reveal {
-            position: absolute;
-            right: -100px;
-            top: 0;
-            bottom: 0;
-            background: var(--danger);
-            color: white;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            font-weight: bold;
-            transition: right 0.2s;
-        }
-        .set-row.swiping .set-delete-reveal {
-            right: 0;
-        }
+    .pr-celebration {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        padding: 30px;
+        border-radius: 20px;
+        z-index: 9999;
+        text-align: center;
+        animation: prPop 0.5s forwards;
+        box-shadow: 0 20px 60px rgba(251, 191, 36, 0.5);
+    }
+    .pr-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 10px;
+    }
+    .pr-exercise {
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 8px;
+    }
+    .pr-detail {
+        font-size: 14px;
+        color: #000;
+        margin: 4px 0;
+    }
+    @keyframes prPop {
+        0% { transform: translate(-50%, -50%) scale(0); }
+        50% { transform: translate(-50%, -50%) scale(1.1); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+    }
 
-        .pr-celebration {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            padding: 30px;
-            border-radius: 20px;
-            z-index: 9999;
-            text-align: center;
-            animation: prPop 0.5s forwards;
-            box-shadow: 0 20px 60px rgba(251, 191, 36, 0.5);
-        }
-        .pr-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 10px;
-        }
-        .pr-exercise {
-            font-size: 18px;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
-        }
-        .pr-detail {
-            font-size: 14px;
-            color: #000;
-            margin: 4px 0;
-        }
-        @keyframes prPop {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 </head>
 <body>
 
@@ -2053,51 +2132,97 @@ if(completedExercises.length === 0) {
         }
     }
 
-    function startTimer(seconds) {
-        clearInterval(timerInterval);
-        const banner = document.getElementById('timer-banner');
-        banner.style.display = 'flex';
-        
-        const adContainer = document.getElementById('timer-ad-container');
-        if(typeof adsbygoogle !== 'undefined') {
-            try {
-                adContainer.innerHTML = '<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-9180492943097575" data-ad-slot="6115261796"></ins>';
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            } catch(e) {}
-        }
-        
-        let remaining = seconds;
+    // IMPROVED TIMER FUNCTIONS - Replace existing timer functions with these
+
+function startTimer(seconds) {
+    clearInterval(timerInterval);
+    const banner = document.getElementById('timer-banner');
+    banner.style.display = 'flex';
+    banner.style.background = 'var(--accent)';
+    
+    const adContainer = document.getElementById('timer-ad-container');
+    if(typeof adsbygoogle !== 'undefined') {
+        try {
+            adContainer.innerHTML = '<ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-9180492943097575" data-ad-slot="6115261796"></ins>';
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch(e) {}
+    }
+    
+    let remaining = seconds;
+    updateTimerDisplay(remaining);
+    
+    timerInterval = setInterval(() => {
+        remaining--;
         updateTimerDisplay(remaining);
         
-        timerInterval = setInterval(() => {
-            remaining--;
-            updateTimerDisplay(remaining);
-            
-            if(remaining <= 3 && remaining > 0) {
-                if(navigator.vibrate) navigator.vibrate(100);
-            }
-            
-            if(remaining <= 0) {
-                stopTimer();
-                playTimerSound();
-                if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-            }
-        }, 1000);
-    }
+        // Audio countdown beeps
+        if(remaining === 10) {
+            playBeep(600, 0.15); // 10 second warning
+        }
+        if(remaining <= 5 && remaining > 0) {
+            playBeep(800, 0.2); // Countdown beeps
+            if(navigator.vibrate) navigator.vibrate(50);
+        }
+        if(remaining === 0) {
+            playBeep(1000, 0.5, 3); // Triple beep finish
+            if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+            setTimeout(() => stopTimer(), 2000);
+        }
+    }, 1000);
+}
 
-    function updateTimerDisplay(remaining) {
-        let m = Math.floor(remaining / 60);
-        let s = remaining % 60;
-        const display = `${m}:${s < 10 ? '0' : ''}${s}`;
-        document.getElementById('timer-display').innerText = display;
-        document.title = remaining > 0 ? `(${display}) ZeroLog` : 'ZeroLog';
+function playBeep(frequency = 800, duration = 0.2, count = 1) {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        for(let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                const startTime = audioContext.currentTime + (i * 0.15);
+                gainNode.gain.setValueAtTime(0.3, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + duration);
+            }, i * 150);
+        }
+    } catch(e) {
+        console.log('Audio not supported');
     }
+}
 
-    function stopTimer() {
-        clearInterval(timerInterval);
-        document.getElementById('timer-banner').style.display = 'none';
-        document.title = 'ZeroLog';
+function updateTimerDisplay(remaining) {
+    let m = Math.floor(remaining / 60);
+    let s = remaining % 60;
+    const display = `${m}:${s < 10 ? '0' : ''}${s}`;
+    document.getElementById('timer-display').innerText = display;
+    
+    // Visual feedback for final countdown
+    const banner = document.getElementById('timer-banner');
+    if(remaining <= 5 && remaining > 0) {
+        banner.style.background = '#ef4444';
+    } else if(remaining <= 10 && remaining > 5) {
+        banner.style.background = '#f59e0b';
+    } else {
+        banner.style.background = 'var(--accent)';
     }
+    
+    document.title = remaining > 0 ? `(${display}) ZeroLog` : 'ZeroLog';
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    document.getElementById('timer-banner').style.display = 'none';
+    document.title = 'ZeroLog';
+}
 
     function playTimerSound() {
         try {
@@ -2805,109 +2930,116 @@ if(completedExercises.length === 0) {
             </div>`;
         }
 
-        a.innerHTML += dailyEx.map(ex => {
-            const lastWorkout = getLastWorkoutForExercise(ex.name);
-            const volume = calculateExerciseVolume(ex.sets);
-            const lastSet = ex.sets.length > 0 ? ex.sets[ex.sets.length - 1] : null;
-            const timeSince = getTimeSinceLastSet(ex.id);
-            const note = exerciseNotes[ex.name] || '';
+// Inside render() function, replace the exercise card HTML generation:
 
-            if (compactView && ex.sets.length > 0) {
-                const weights = [...new Set(ex.sets.map(s => s.weight))];
-                const setsDisplay = weights.map(w => {
-                    const repsForWeight = ex.sets.filter(s => s.weight == w).map(s => s.reps).join(',');
-                    return `${w}kg: ${repsForWeight}`;
-                }).join(' • ');
+a.innerHTML += dailyEx.map(ex => {
+    const lastWorkout = getLastWorkoutForExercise(ex.name);
+    const volume = calculateExerciseVolume(ex.sets);
+    const lastSet = ex.sets.length > 0 ? ex.sets[ex.sets.length - 1] : null;
+    const timeSince = getTimeSinceLastSet(ex.id);
+    const note = exerciseNotes[ex.name] || '';
 
-                return `<div class="exercise-card">
-                    ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
-                    <div class="ex-header">
-                        <span class="ex-header-left" onclick="showExerciseHistory('${ex.name.replace(/'/g, "\\'")}')">${ex.name}</span>
-                        <span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span>
-                    </div>
-                    <div class="compact-sets">${setsDisplay}</div>
-                    ${note ? `<div style="font-size:11px; color:var(--warning); margin-top:5px;">💡 ${note}</div>` : ''}
-                    <div class="input-row" style="margin-top:10px;">
-                        <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5" ontouchstart="handleWeightInputTap(${ex.id})">
-                        <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1">
-                        <button onclick="addSet(${ex.id})">✓</button>
-                    </div>
-                </div>`;
-            }
+    if (compactView && ex.sets.length > 0) {
+        const weights = [...new Set(ex.sets.map(s => s.weight))];
+        const setsDisplay = weights.map(w => {
+            const repsForWeight = ex.sets.filter(s => s.weight == w).map(s => s.reps).join(',');
+            return `${w}kg: ${repsForWeight}`;
+        }).join(' • ');
 
-            return `<div class="exercise-card">
-                ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
-                <div class="ex-header">
-                    <span class="ex-header-left" onclick="showExerciseHistory('${ex.name.replace(/'/g, "\\'")}')">${ex.name}</span>
-                    <span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span>
-                </div>
-                ${note ? `<div style="font-size:11px; color:var(--warning); padding:8px; background:rgba(245, 158, 11, 0.1); border-radius:6px; margin-bottom:10px;">💡 ${note}</div>` : ''}
-                ${lastWorkout ? `<div class="last-workout-ref">
-                    <div class="last-workout-ref-header" onclick="toggleLastWorkoutRef(${ex.id})">
-                        <span>Last time ▼</span>
-                        <span style="color: var(--accent);">${lastWorkout.sets.length} sets</span>
-                    </div>
-                    <div class="last-workout-ref-content" id="last-workout-${ex.id}">
-                        ${lastWorkout.sets.map((s, i) => `Set ${i+1}: ${s.weight}kg × ${s.reps}`).join(' • ')}
-                    </div>
-                </div>` : ''}
-                ${ex.sets.map((s, i) => {
-                    const progress = i === ex.sets.length - 1 && lastWorkout ? getProgressIndicator(ex.name, s.weight, s.reps) : '';
-                    const typeB = s.type === 'warmup' ? '<span class="set-type-badge warmup-badge">W</span>' : 
-                                s.type === 'cluster' ? '<span class="set-type-badge cluster-badge">C</span>' :
-                                s.type === 'drop' ? '<span class="set-type-badge drop-badge">D</span>' :
-                                s.type === 'amrap' ? '<span class="set-type-badge amrap-badge">A</span>' : '';
-                    const noteD = s.note ? `<span class="set-note">💬 ${s.note}</span>` : '';
-                    
-                    return `<div class="set-row" ontouchstart="handleSwipeStart(event, ${ex.id}, ${i})" ontouchmove="handleSwipeMove(event, ${ex.id}, ${i})" ontouchend="handleSwipeEnd(event, ${ex.id}, ${i})">
-                        <span>Set ${i + 1}: ${s.weight}kg × ${s.reps}${typeB}${progress}${noteD}</span>
-                        <span class="delete-btn" onclick="deleteSet(${ex.id},${i})">✕</span>
-                        <div class="set-delete-reveal">DELETE</div>
-                    </div>`;
-                }).join('')}
-                ${timeSince ? `<div class="time-since">⏱️ ${timeSince}</div>` : ''}
-                <div class="weight-controls">
-                    <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -5)">−5</button>
-                    <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -2.5)">−2.5</button>
-                    <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 2.5)">+2.5</button>
-                    <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 5)">+5</button>
-                </div>
-                <div class="input-row">
-                    <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5" ontouchstart="handleWeightInputTap(${ex.id})">
-                    <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1">
-                    <button onclick="addSet(${ex.id})">✓</button>
-                </div>
-                <div class="set-type-selector">
-                    <label class="type-btn active">
-                        <input type="radio" name="type-${ex.id}" value="working" checked style="display:none">
-                        💪 Working
-                    </label>
-                    <label class="type-btn">
-                        <input type="radio" name="type-${ex.id}" value="warmup" style="display:none">
-                        🔥 Warmup
-                    </label>
-                    <label class="type-btn">
-                        <input type="radio" name="type-${ex.id}" value="cluster" style="display:none">
-                        🔗 Cluster
-                    </label>
-                    <label class="type-btn">
-                        <input type="radio" name="type-${ex.id}" value="drop" style="display:none">
-                        ⬇️ Drop
-                    </label>
-                    <label class="type-btn">
-                        <input type="radio" name="type-${ex.id}" value="amrap" style="display:none">
-                        🔥 AMRAP
-                    </label>
-                </div>
-                <input type="text" id="note-${ex.id}" class="note-input" placeholder="💬 Quick note (optional)...">
-                <select class="feel-select" onchange="updateFeeling(${ex.id},this.value)">
-                    <option value="">How did it feel?</option>
-                    <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
-                    <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
-                    <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
-                </select>
+        return `<div class="exercise-card">
+            ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
+            <div class="ex-header">
+                <span class="ex-header-left" onclick="showExerciseHistory('${ex.name.replace(/'/g, "\\'")}')">${ex.name}</span>
+                <span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span>
+            </div>
+            <div class="compact-sets">${setsDisplay}</div>
+            ${note ? `<div style="font-size:11px; color:var(--warning); margin-top:5px;">💡 ${note}</div>` : ''}
+            <div class="input-row" style="margin-top:10px;">
+                <input type="number" id="w-${ex.id}" placeholder="kg" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5" ontouchstart="handleWeightInputTap(${ex.id})">
+                <input type="number" id="r-${ex.id}" placeholder="reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1">
+                <button onclick="addSet(${ex.id})">✓</button>
+            </div>
+        </div>`;
+    }
+
+    return `<div class="exercise-card">
+        ${volume > 0 ? `<div class="ex-volume">📊 ${Math.round(volume)}kg</div>` : ''}
+        <div class="ex-header">
+            <span class="ex-header-left" onclick="showExerciseHistory('${ex.name.replace(/'/g, "\\'")}')">${ex.name}</span>
+            <span class="delete-btn" onclick="deleteExercise(${ex.id},'${ex.name.replace(/'/g, "\\'")}');">✕</span>
+        </div>
+        ${note ? `<div style="font-size:11px; color:var(--warning); padding:8px; background:rgba(245, 158, 11, 0.1); border-radius:6px; margin-bottom:10px;">💡 ${note}</div>` : ''}
+        ${lastWorkout ? `<div class="last-workout-ref">
+            <div class="last-workout-ref-header" onclick="toggleLastWorkoutRef(${ex.id})">
+                <span>Last time ▼</span>
+                <span style="color: var(--accent);">${lastWorkout.sets.length} sets</span>
+            </div>
+            <div class="last-workout-ref-content" id="last-workout-${ex.id}">
+                ${lastWorkout.sets.map((s, i) => `Set ${i+1}: ${s.weight}kg × ${s.reps}`).join(' • ')}
+            </div>
+        </div>` : ''}
+        ${ex.sets.map((s, i) => {
+            const progress = i === ex.sets.length - 1 && lastWorkout ? getProgressIndicator(ex.name, s.weight, s.reps) : '';
+            const typeB = s.type === 'warmup' ? '<span class="set-type-badge warmup-badge">W</span>' : 
+                        s.type === 'cluster' ? '<span class="set-type-badge cluster-badge">C</span>' :
+                        s.type === 'drop' ? '<span class="set-type-badge drop-badge">D</span>' :
+                        s.type === 'amrap' ? '<span class="set-type-badge amrap-badge">A</span>' : '';
+            const noteD = s.note ? `<br><span style="font-size:11px; color:var(--dim);">💬 ${s.note}</span>` : '';
+            
+            return `<div class="set-row" ontouchstart="handleSwipeStart(event, ${ex.id}, ${i})" ontouchmove="handleSwipeMove(event, ${ex.id}, ${i})" ontouchend="handleSwipeEnd(event, ${ex.id}, ${i})">
+                <span>Set ${i + 1}: ${s.weight}kg × ${s.reps}${typeB}${progress}${noteD}</span>
+                <span class="delete-btn" onclick="deleteSet(${ex.id},${i})">✕</span>
+                <div class="set-delete-reveal">DELETE</div>
             </div>`;
-        }).join('');
+        }).join('')}
+        ${timeSince ? `<div class="time-since">⏱️ ${timeSince}</div>` : ''}
+        
+        <div class="input-row">
+            <input type="number" id="w-${ex.id}" placeholder="Weight (kg)" inputmode="decimal" value="${lastSet ? lastSet.weight : ''}" step="0.5" ontouchstart="handleWeightInputTap(${ex.id})">
+            <input type="number" id="r-${ex.id}" placeholder="Reps" inputmode="numeric" value="${lastSet ? lastSet.reps : ''}" step="1">
+            <button onclick="addSet(${ex.id})">✓</button>
+        </div>
+        
+        <div class="weight-controls">
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -5)">−5kg</button>
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, -2.5)">−2.5kg</button>
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 2.5)">+2.5kg</button>
+            <button class="weight-adjust-btn" onclick="adjustWeight(${ex.id}, 5)">+5kg</button>
+        </div>
+        
+        <div class="set-type-selector">
+            <label class="type-btn active">
+                <input type="radio" name="type-${ex.id}" value="working" checked style="display:none">
+                💪
+            </label>
+            <label class="type-btn">
+                <input type="radio" name="type-${ex.id}" value="warmup" style="display:none">
+                🔥
+            </label>
+            <label class="type-btn">
+                <input type="radio" name="type-${ex.id}" value="cluster" style="display:none">
+                🔗
+            </label>
+            <label class="type-btn">
+                <input type="radio" name="type-${ex.id}" value="drop" style="display:none">
+                ⬇️
+            </label>
+            <label class="type-btn">
+                <input type="radio" name="type-${ex.id}" value="amrap" style="display:none">
+                🔥
+            </label>
+        </div>
+        
+        <input type="text" id="note-${ex.id}" class="note-input" placeholder="💬 Note (optional)...">
+        
+        <select class="feel-select" onchange="updateFeeling(${ex.id},this.value)">
+            <option value="">How did it feel?</option>
+            <option value="Easy" ${ex.feeling === 'Easy' ? 'selected' : ''}>Easy (RPE 5-6)</option>
+            <option value="Solid" ${ex.feeling === 'Solid' ? 'selected' : ''}>Solid (RPE 7-8)</option>
+            <option value="Brutal" ${ex.feeling === 'Brutal' ? 'selected' : ''}>Brutal (RPE 9-10)</option>
+        </select>
+    </div>`;
+}).join('');
 
         setTimeout(() => {
             document.querySelectorAll('.type-btn').forEach(btn => {

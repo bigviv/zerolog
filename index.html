@@ -435,22 +435,32 @@
     }
     .delete-btn { color: #ff4444; cursor: pointer; font-weight: bold; font-size: 18px; }
     
-    .input-row { 
-        display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 8px; 
-        margin-top: 15px; 
-    }
-    .input-row input { 
-        background: #111; 
-        border: 2px solid #222; 
-        color: white; 
-        padding: 18px 12px; 
-        border-radius: 8px; 
-        text-align: center; 
-        font-size: 20px; 
-        font-weight: bold;
-    }
+    /* --- MOBILE-SAFE INPUT GRID FIX --- */
+.input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 15px;
+  align-items: stretch;
+}
+
+.input-row input {
+  width: 100%;
+  min-width: 0;              
+  max-width: 100%;
+  font-size: clamp(16px, 4.2vw, 20px);
+  padding: clamp(12px, 3.5vw, 18px) 10px;
+}
+
+.exercise-card {
+  overflow: hidden;       
+}
+    @media (max-width: 420px) {
+  body { padding: 12px; padding-bottom: 110px; }
+  .exercise-card { padding: 12px; }
+  .weight-controls { gap: 6px; }
+  .weight-adjust-btn { font-size: 10px; padding: 10px 4px; }
+}
     .input-row input:focus { 
         border-color: var(--accent); 
         outline: none; 
@@ -766,8 +776,23 @@
             padding: 8px 2px;
         }
     }
+    /* --- SAFE AREA / FIXED UI MOBILE FIX --- */
+body {
+  padding-top: calc(20px + env(safe-area-inset-top));
+  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}
+
+.workout-timer,
+.theme-toggle {
+  top: calc(10px + env(safe-area-inset-top));
+}
+
+.quick-timer-bar {
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+    
 </style>
-�
+
 
 <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
 <div class="workout-timer" id="workout-timer">🕐 0:00</div>
@@ -3175,5 +3200,3 @@ const gainNode = audioContext.createGain();
     </script>
 </body>
 </html>
-</boltAction>
-</boltArtifact>

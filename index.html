@@ -1174,7 +1174,7 @@
     <script>
         let currentDay = new Date().toLocaleDateString('en-US', { weekday: 'short' });
         let workouts = [], restDays = [], dayLabels = {}, history = [], customExercises = [];
-        let timerInterval, undoStack = [], defaultTimer = 90, exerciseDatabase = [], filteredExercises = [];
+        let timerInterval, timerRemainingSeconds = 0, undoStack = [], defaultTimer = 90, exerciseDatabase = [], filteredExercises = [];
         let workoutStartTime = null, workoutTimerInterval = null, autoStartTimer = false;
         let lastTap = 0, touchStartX = 0, touchEndX = 0, compactView = false, workoutStreak = 0;
         let lastSetTime = {}, theme = 'dark';
@@ -2302,7 +2302,21 @@ if(completedExercises.length === 0) {
     }
 
     // IMPROVED TIMER FUNCTIONS - Replace existing timer functions with these
-
+function haptic(intensity = 'medium') {
+    if (!navigator.vibrate) return;
+    
+    const patterns = {
+        light: 10,
+        medium: 20,
+        heavy: 50
+    };
+    
+    try {
+        navigator.vibrate(patterns[intensity] || 20);
+    } catch(e) {
+        // Vibration not supported or blocked
+    }
+}
 function startTimer(seconds) {
     clearInterval(timerInterval);
     timerRemainingSeconds = seconds || defaultTimer;

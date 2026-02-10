@@ -361,6 +361,13 @@
         border: 1px solid #1a1a1a; 
         position: relative;
         box-sizing: border-box;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .exercise-card > * {
+        min-width: 0;
+        max-width: 100%;
     }
 
     /* Input row for kg/reps + ADD SET button */
@@ -368,18 +375,23 @@
         display: grid; 
         grid-template-columns: 1fr 1fr; 
         gap: 8px; 
-        margin-top: 15px; 
+        margin-top: 15px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .input-row input { 
         background: #111; 
         border: 2px solid #222; 
         color: white; 
-        padding: 18px 12px; 
+        padding: 16px 8px;
         border-radius: 8px; 
         text-align: center; 
-        font-size: 20px; 
+        font-size: 18px;
         font-weight: bold;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .input-row input:focus { 
@@ -393,10 +405,13 @@
 
     .input-row button {
         grid-column: 1 / -1;
-        padding: 18px;
-        font-size: 18px;
+        padding: 16px;
+        font-size: 16px;
         border-radius: 8px;
         background: var(--success);
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     /* Weight adjustment buttons */
@@ -405,18 +420,22 @@
         grid-template-columns: repeat(4, 1fr);
         gap: 6px;
         margin-top: 10px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .weight-adjust-btn {
         background: #1a1a1a;
         border: 1px solid #333;
         color: var(--accent);
-        padding: 10px 4px;
+        padding: 10px 2px;
         border-radius: 6px;
         font-weight: bold;
         cursor: pointer;
         font-size: 10px;
         min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
         text-align: center;
     }
 
@@ -431,19 +450,23 @@
         grid-template-columns: repeat(5, 1fr);
         gap: 6px;
         margin-top: 10px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .type-btn {
         background: #111;
         border: 1px solid #222;
         color: var(--dim);
-        padding: 10px 6px;
+        padding: 10px 4px;
         border-radius: 6px;
         font-size: 16px;
         cursor: pointer;
         user-select: none;
         text-align: center;
         min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .type-btn.active {
@@ -602,6 +625,7 @@
 
     .note-input {
         width: 100%;
+        max-width: 100%;
         background: #111;
         border: 1px solid #222;
         color: var(--text);
@@ -609,17 +633,20 @@
         border-radius: 8px;
         margin-top: 10px;
         font-size: 13px;
+        box-sizing: border-box;
     }
     
     .feel-select { 
-        width: 100%; 
+        width: 100%;
+        max-width: 100%;
         background: #111; 
         border: 1px solid #222; 
         color: var(--dim); 
         padding: 12px; 
         border-radius: 8px; 
         margin-top: 10px; 
-        font-size: 13px; 
+        font-size: 13px;
+        box-sizing: border-box;
     }
     
     .recovery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
@@ -847,11 +874,15 @@
     
     @media (max-width: 380px) {
         .input-row input {
-            font-size: 18px;
-            padding: 16px 10px;
+            font-size: 16px;
+            padding: 14px 6px;
         }
         .weight-adjust-btn {
             font-size: 9px;
+            padding: 8px 1px;
+        }
+        .type-btn {
+            font-size: 14px;
             padding: 8px 2px;
         }
     }

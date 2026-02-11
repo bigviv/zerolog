@@ -670,7 +670,29 @@
         transition: background 0.3s;
     }
     .timer-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-    .timer-ad { background: #fff; border-radius: 8px; padding: 5px; text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+    
+    .timer-ad { 
+        background: #fff; 
+        border-radius: 8px; 
+        padding: 5px; 
+        text-align: center; 
+        width: 100%;
+        max-width: 330px;
+        height: 60px;
+        margin: 0 auto;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        box-sizing: border-box;
+    }
+    
+    .timer-ad > *,
+    .timer-ad ins {
+        max-width: 100% !important;
+        max-height: 100% !important;
+    }
     
     button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .btn-full { width: 100%; padding: 18px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; margin-bottom: 20px; }
@@ -884,6 +906,105 @@
         .type-btn {
             font-size: 14px;
             padding: 8px 2px;
+        }
+    }
+
+    /* Custom Modal Dialogs - Replaces alert() and confirm() */
+    .custom-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s;
+    }
+    
+    .custom-modal-overlay.active {
+        display: flex;
+    }
+    
+    .custom-modal {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 24px;
+        max-width: 90%;
+        width: 400px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s;
+        border: 1px solid #333;
+    }
+    
+    .custom-modal-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 16px;
+        color: var(--text);
+    }
+    
+    .custom-modal-message {
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--dim);
+        margin-bottom: 24px;
+    }
+    
+    .custom-modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    .custom-modal-btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .custom-modal-btn-primary {
+        background: var(--accent);
+        color: white;
+    }
+    
+    .custom-modal-btn-primary:active {
+        transform: scale(0.95);
+    }
+    
+    .custom-modal-btn-secondary {
+        background: #333;
+        color: var(--text);
+    }
+    
+    .custom-modal-btn-secondary:active {
+        transform: scale(0.95);
+    }
+    
+    .custom-modal-btn-danger {
+        background: var(--danger);
+        color: white;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 </style>
@@ -1162,7 +1283,7 @@
             </div>
         </div>
         <div class="timer-ad" id="timer-ad-container">
-            <ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="ca-pub-9180492943097575" data-ad-slot="2575154803"></ins>
+            <!-- Android AdMob ad will be injected here by native code -->
         </div>
     </div>
     <div id="undo-banner" class="undo-banner">
@@ -1296,7 +1417,7 @@
             
             const dailyEx = workouts.filter(ex => ex.day === currentDay);
             if (dailyEx.length === 0) {
-                alert('No exercises to save!');
+                showAlert('No exercises to save!');
                 return;
             }
 
@@ -1311,15 +1432,16 @@
             } catch(e) {}
 
             renderTemplates();
-            alert('Template saved!');
+            showAlert('Template saved!');
         }
 
-        function loadTemplate(id) {
+        async function loadTemplate(id) {
             const template = templates.find(t => t.id === id);
             if (!template) return;
 
             if (workouts.filter(ex => ex.day === currentDay).length > 0) {
-                if (!confirm('This will clear current exercises. Continue?')) return;
+                const confirmed = await showConfirm('This will clear current exercises. Continue?', 'Load Template', 'Continue', 'Cancel');
+                if (!confirmed) return;
             }
 
             workouts = workouts.filter(ex => ex.day !== currentDay);
@@ -1338,8 +1460,9 @@
             save();
         }
 
-        function deleteTemplate(id) {
-            if (!confirm('Delete this template?')) return;
+        async function deleteTemplate(id) {
+            const confirmed = await showConfirm('Delete this template?', 'Delete Template', 'Delete', 'Cancel', true);
+            if (!confirmed) return;
             templates = templates.filter(t => t.id !== id);
             try {
                 localStorage.setItem('zerolog_templates', JSON.stringify(templates));
@@ -1409,7 +1532,7 @@
         function logBodyWeight() {
             const weight = parseFloat(document.getElementById('bodyweight-input').value);
             if (!weight || weight <= 0) {
-                alert('Enter valid weight');
+                showAlert('Enter valid weight');
                 return;
             }
 
@@ -1538,8 +1661,9 @@
             }
         }
 
-        function createDeloadWeek() {
-            if (!confirm('This will reduce all working weights by 30% for this week. Continue?')) return;
+        async function createDeloadWeek() {
+            const confirmed = await showConfirm('This will reduce all working weights by 30% for this week. Continue?', 'Create Deload Week', 'Reduce Weights', 'Cancel', false);
+            if (!confirmed) return;
 
             workouts = workouts.map(ex => {
                 return {
@@ -1552,14 +1676,14 @@
             });
 
             save();
-            alert('Deload week created! Weights reduced by 30%');
+            showAlert('Deload week created! Weights reduced by 30%');
         }
 
         // Warmup Calculator
         function calcWarmup() {
             const target = parseFloat(document.getElementById('warmup-target').value);
             if (!target || target <= 0) {
-                alert('Enter working weight');
+                showAlert('Enter working weight');
                 return;
             }
 
@@ -1741,7 +1865,7 @@
         // CSV Export
         function exportCSV() {
             if (history.length === 0) {
-                alert('No history to export');
+                showAlert('No history to export');
                 return;
             }
 
@@ -1980,6 +2104,81 @@
             render();
         }
 
+        // Custom Modal System (replaces alert/confirm)
+        function showAlert(message, title = 'ZeroLog') {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-modal-overlay active';
+                overlay.innerHTML = `
+                    <div class="custom-modal">
+                        <div class="custom-modal-title">${title}</div>
+                        <div class="custom-modal-message">${message}</div>
+                        <div class="custom-modal-buttons">
+                            <button class="custom-modal-btn custom-modal-btn-primary" id="modal-ok-btn">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                
+                const okBtn = document.getElementById('modal-ok-btn');
+                okBtn.onclick = () => {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 200);
+                    resolve(true);
+                };
+                
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                        setTimeout(() => overlay.remove(), 200);
+                        resolve(true);
+                    }
+                };
+            });
+        }
+
+        function showConfirm(message, title = 'Confirm', okText = 'OK', cancelText = 'Cancel', isDanger = false) {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-modal-overlay active';
+                const btnClass = isDanger ? 'custom-modal-btn-danger' : 'custom-modal-btn-primary';
+                overlay.innerHTML = `
+                    <div class="custom-modal">
+                        <div class="custom-modal-title">${title}</div>
+                        <div class="custom-modal-message">${message}</div>
+                        <div class="custom-modal-buttons">
+                            <button class="custom-modal-btn custom-modal-btn-secondary" id="modal-cancel-btn">${cancelText}</button>
+                            <button class="custom-modal-btn ${btnClass}" id="modal-ok-btn">${okText}</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                
+                const okBtn = document.getElementById('modal-ok-btn');
+                const cancelBtn = document.getElementById('modal-cancel-btn');
+                
+                okBtn.onclick = () => {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 200);
+                    resolve(true);
+                };
+                
+                cancelBtn.onclick = () => {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 200);
+                    resolve(false);
+                };
+                
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                        setTimeout(() => overlay.remove(), 200);
+                        resolve(false);
+                    }
+                };
+            });
+        }
+
         function init() {
             loadData();
             loadPRs();
@@ -2103,8 +2302,9 @@
             }
         }
 
-        function deleteExercise(exId, exName) {
-            if(confirm(`Delete "${exName}" and all its sets?`)) {
+        async function deleteExercise(exId, exName) {
+            const confirmed = await showConfirm(`Delete "${exName}" and all its sets?`, 'Delete Exercise', 'Delete', 'Cancel', true);
+            if (confirmed) {
                 workouts = workouts.filter(w => w.id !== exId);
                 save();
             }
@@ -2163,7 +2363,7 @@
             const dailyEx = workouts.filter(ex => ex.day === currentDay);
             const completedExercises = dailyEx.filter(ex => ex.sets.length > 0);
 if(completedExercises.length === 0) { 
-            alert('Add some sets before completing your workout!'); 
+            showAlert('Add some sets before completing your workout!'); 
             return; 
         }
         
@@ -2195,7 +2395,7 @@ if(completedExercises.length === 0) {
         try { 
             localStorage.setItem('zerolog_history', JSON.stringify(history)); 
         } catch(e) { 
-            alert('Warning: Could not save workout history.'); 
+            showAlert('Warning: Could not save workout history.'); 
         }
         
         const completedIds = completedExercises.map(ex => ex.id);
@@ -2209,7 +2409,7 @@ if(completedExercises.length === 0) {
         calculateStreak();
         save(); 
         document.getElementById('workout-notes').value = '';
-        alert('Workout logged!');
+        showAlert('Workout logged!');
     }
 
     function deleteSet(exId, index) {
@@ -2250,19 +2450,22 @@ if(completedExercises.length === 0) {
         save();
     }
 
-    function repeatLastWorkout() {
+    async function repeatLastWorkout() {
         const lastWorkout = getLastWorkoutForDay(currentDay);
-        if(lastWorkout && confirm('Load exercises from your last ' + currentDay + ' workout?')) {
-            lastWorkout.exercises.forEach(ex => {
-                workouts.push({
-                    id: Date.now() + Math.random(),
-                    day: currentDay,
-                    name: ex.name,
-                    sets: [],
-                    feeling: ''
+        if(lastWorkout) {
+            const confirmed = await showConfirm('Load exercises from your last ' + currentDay + ' workout?', 'Repeat Last Workout', 'Load', 'Cancel');
+            if (confirmed) {
+                lastWorkout.exercises.forEach(ex => {
+                    workouts.push({
+                        id: Date.now() + Math.random(),
+                        day: currentDay,
+                        name: ex.name,
+                        sets: [],
+                        feeling: ''
+                    });
                 });
-            });
-            save();
+                save();
+            }
         }
     }
 
@@ -2295,13 +2498,14 @@ if(completedExercises.length === 0) {
             try {
                 localStorage.setItem('zerolog_default_timer', defaultTimer);
             } catch(e) {}
-            alert('Timer settings saved!');
+            showAlert('Timer settings saved!');
         } else {
-            alert('Please enter a value between 30 and 300 seconds');
+            showAlert('Please enter a value between 30 and 300 seconds');
         }
     }
 
     // IMPROVED TIMER FUNCTIONS - Replace existing timer functions with these
+
 function haptic(intensity = 'medium') {
     if (!navigator.vibrate) return;
     
@@ -2317,6 +2521,7 @@ function haptic(intensity = 'medium') {
         // Vibration not supported or blocked
     }
 }
+
 function startTimer(seconds) {
     clearInterval(timerInterval);
     timerRemainingSeconds = seconds || defaultTimer;
@@ -2766,8 +2971,9 @@ function stopTimer() {
         render();
     }
 
-    function resetData() {
-        if(confirm("ZeroLog: Wipe all data? This cannot be undone!")) {
+    async function resetData() {
+        const confirmed = await showConfirm("Wipe all data? This cannot be undone!", "Reset All Data", "Delete Everything", "Cancel", true);
+        if (confirmed) {
             try {
                 localStorage.clear();
                 location.reload();
@@ -2801,7 +3007,7 @@ function stopTimer() {
             a.download = `zerolog_export_${t}.json`;
             a.click();
         } catch(e) {
-            alert('Error exporting data.');
+            showAlert('Error exporting data.');
         }
     }
 
@@ -2813,9 +3019,9 @@ function stopTimer() {
             a.href = URL.createObjectURL(b);
             a.download = 'zerolog.html';
             a.click();
-            alert('HTML file downloaded!');
+            showAlert('HTML file downloaded!');
         } catch(e) {
-            alert('Error downloading file.');
+            showAlert('Error downloading file.');
         }
     }
 
@@ -2824,11 +3030,12 @@ function stopTimer() {
         if(!f) return;
         
         const r = new FileReader();
-        r.onload = function(e) {
+        r.onload = async function(e) {
             try {
                 const d = JSON.parse(e.target.result);
                 
-                if(confirm('Import data? This will merge with your current data. Export first if you want to backup!')) {
+                const confirmed = await showConfirm('Import data? This will merge with your current data. Export first if you want to backup!', 'Import Data', 'Import', 'Cancel');
+                if(confirmed) {
                     if(d.workouts && Array.isArray(d.workouts)) {
                         const eIds = new Set(workouts.map(w => w.id));
                         const nw = d.workouts.filter(w => !eIds.has(w.id));
@@ -2883,11 +3090,11 @@ function stopTimer() {
                         localStorage.setItem('zerolog_bodyweight', JSON.stringify(bodyWeightLog));
                     }
                     
-                    alert('Data imported successfully!');
+                    showAlert('Data imported successfully!');
                     init();
                 }
             } catch(e) {
-                alert('Error importing data.');
+                showAlert('Error importing data.');
             }
         };
         
@@ -2987,7 +3194,7 @@ function stopTimer() {
         const c = document.getElementById('exercise-library-list');
         
         if(!si || si.length < 3) {
-            alert("Please enter at least 3 characters to search the cloud database.");
+            showAlert("Please enter at least 3 characters to search the cloud database.");
             return;
         }
         

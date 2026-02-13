@@ -1,12 +1,3 @@
-Here are the fixes for both issues.
-1. Fix "Messy" AdMob Banner
-The "messy" look usually happens because the container has a white background (#fff) and padding (5px) while the native ad is trying to fill the space. This creates an ugly white border around the ad on a dark-themed app.
-The Fix: We will make the container background transparent, remove the padding, and set the height to exactly 50px (the standard height of a mobile banner).
-2. Fix Timer Not Closing
-In your current JavaScript, when the timer hits 0, you clearInterval (stop counting) and beep, but you never call stopTimer(). This is why the popup stays on the screen forever.
-The Fix: We will add a logic to wait 1.5 seconds (so the user hears the beep and sees "0:00"), and then automatically close the popup.
-✅ The Corrected Code
-Replace your entire HTML file with this version. I have applied the CSS polish and the JavaScript fix.
 <!DOCTYPE html>
 <html lang="en">
 <head>
